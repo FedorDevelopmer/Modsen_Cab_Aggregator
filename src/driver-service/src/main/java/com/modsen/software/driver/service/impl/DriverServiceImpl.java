@@ -31,9 +31,9 @@ public class DriverServiceImpl {
     public List<DriverResponseTO> getAllDrivers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         return repository.findAll(PageRequest.of(pageNumber, pageSize,
                         Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                .stream()
-                .map(mapper::driverToResponse)
-                .collect(Collectors.toList());
+                        .stream()
+                        .map(mapper::driverToResponse)
+                        .collect(Collectors.toList());
 
     }
 
@@ -53,6 +53,7 @@ public class DriverServiceImpl {
     @Transactional
     public DriverResponseTO saveDriver(DriverRequestTO driverTO) {
         checkDuplications(driverTO);
+        driverTO.setId(null);
         Driver saved = repository.save(mapper.requestToDriver(driverTO));
         return mapper.driverToResponse(saved);
     }

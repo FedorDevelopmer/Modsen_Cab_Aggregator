@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExceptionHandling {
-    public static ResponseEntity<Object> formExceptionResponse(HttpStatus exceptionStatus, RuntimeException e, WebRequest request) {
+    public static ResponseEntity<Object> formExceptionResponse(HttpStatus exceptionStatus, Exception e, WebRequest request) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("status", exceptionStatus.value());
         responseBody.put("error", exceptionStatus.name());

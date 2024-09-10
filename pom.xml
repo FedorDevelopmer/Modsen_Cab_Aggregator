@@ -14,22 +14,9 @@
     <packaging>pom</packaging>
     <name>Cab Aggregator Project</name>
 	<description>Cab aggregator application, developed as Modsen intership project</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
     <modules>
         <module>src/driver-service</module>
     </modules>
-    <scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
 	<properties>
 		<java.version>17</java.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>

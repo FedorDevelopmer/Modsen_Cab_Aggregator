@@ -36,9 +36,9 @@ public class CarServiceImpl implements CarService {
     public List<CarResponseTO> getAllCars(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         return repository.findAll(PageRequest.of(pageNumber, pageSize,
                         Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                .stream()
-                .map(mapper::carToResponse)
-                .collect(Collectors.toList());
+                        .stream()
+                        .map(mapper::carToResponse)
+                        .collect(Collectors.toList());
     }
 
     @Transactional
@@ -51,6 +51,7 @@ public class CarServiceImpl implements CarService {
     public CarResponseTO updateCar(CarRequestTO carTO) {
         checkDuplications(carTO);
         repository.findById(carTO.getId()).orElseThrow(CarNotFoundException::new);
+        driverRepository.findById(carTO.getDriverId()).orElseThrow(DriverNotFoundException::new);
         return saveCar(carTO);
     }
 
@@ -58,6 +59,7 @@ public class CarServiceImpl implements CarService {
     public CarResponseTO saveCar(CarRequestTO carTO) {
         driverRepository.findById(carTO.getDriverId()).orElseThrow(DriverNotFoundException::new);
         checkDuplications(carTO);
+        carTO.setId(null);
         Car saved = repository.save(mapper.requestToCar(carTO));
         return mapper.carToResponse(saved);
     }

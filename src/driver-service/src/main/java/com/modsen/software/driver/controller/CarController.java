@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
@@ -63,6 +64,11 @@ public class CarController {
     @ExceptionHandler(DuplicateRegistrationNumberException.class)
     public ResponseEntity<Object> handleDuplicateDataException(RuntimeException e, WebRequest request) {
         return ExceptionHandling.formExceptionResponse(HttpStatus.CONFLICT, e, request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e, request);
     }
 
 }
