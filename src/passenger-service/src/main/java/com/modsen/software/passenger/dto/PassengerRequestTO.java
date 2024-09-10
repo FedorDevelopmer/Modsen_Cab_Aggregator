@@ -2,6 +2,7 @@ package com.modsen.software.passenger.dto;
 
 import com.modsen.software.passenger.entity.enumeration.Gender;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
+import com.modsen.software.passenger.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,8 @@ import java.sql.Date;
 @Setter
 public class PassengerRequestTO {
 
+    @NotNull(groups = OnUpdate.class)
+    @Min(value = 1,groups = OnUpdate.class)
     private Long id;
 
     @NotBlank
