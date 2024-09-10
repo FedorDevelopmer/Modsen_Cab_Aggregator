@@ -17,6 +17,8 @@ import java.sql.Date;
 @Setter
 public class PassengerRequestTO {
 
+    @NotNull
+    @Min(1)
     private Long id;
 
     @NotBlank
