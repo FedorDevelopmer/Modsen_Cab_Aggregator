@@ -2,6 +2,8 @@ package com.modsen.software.driver.dto;
 
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
+import com.modsen.software.driver.validation.OnCreate;
+import com.modsen.software.driver.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,31 +19,31 @@ import java.sql.Date;
 @Setter
 public class CarRequestTO {
 
-    @NotNull
-    @Min(1)
+    @NotNull(groups = OnUpdate.class)
+    @Min(value = 1,groups = OnUpdate.class)
     private Long id;
 
-    @NotNull
-    @Min(1)
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 1,groups = {OnUpdate.class, OnCreate.class})
     private Long driverId;
 
-    @NotNull
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private Color color;
 
-    @NotBlank
+    @NotBlank(groups = {OnUpdate.class, OnCreate.class})
     private String brand;
 
-    @NotBlank
+    @NotBlank(groups = {OnUpdate.class, OnCreate.class})
     private String registrationNumber;
 
-    @NotNull
-    @Past
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Past(groups = {OnUpdate.class, OnCreate.class})
     private Date inspectionDate;
 
-    @NotNull
-    @Min(6)
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 6,groups = {OnUpdate.class, OnCreate.class})
     private Integer inspectionDurationMonth;
 
-    @NotNull
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private RemoveStatus removeStatus;
 }

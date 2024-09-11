@@ -7,12 +7,15 @@ import com.modsen.software.driver.exception.DuplicateEmailException;
 import com.modsen.software.driver.exception.DuplicatePhoneException;
 import com.modsen.software.driver.exception_handler.ExceptionHandling;
 import com.modsen.software.driver.service.impl.DriverServiceImpl;
+import com.modsen.software.driver.validation.OnCreate;
+import com.modsen.software.driver.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -42,12 +45,12 @@ public class DriverController {
     }
 
     @PutMapping
-    public ResponseEntity<DriverResponseTO> update(@Valid @RequestBody DriverRequestTO driverTO) {
+    public ResponseEntity<DriverResponseTO> update(@Validated(OnUpdate.class) @RequestBody DriverRequestTO driverTO) {
         return new ResponseEntity<>(service.updateDriver(driverTO), HttpStatus.ACCEPTED);
     }
 
     @PostMapping
-    public ResponseEntity<DriverResponseTO> save(@Valid @RequestBody DriverRequestTO driverTO) {
+    public ResponseEntity<DriverResponseTO> save(@Validated(OnCreate.class) @RequestBody DriverRequestTO driverTO) {
         return new ResponseEntity<>(service.saveDriver(driverTO), HttpStatus.CREATED);
     }
 

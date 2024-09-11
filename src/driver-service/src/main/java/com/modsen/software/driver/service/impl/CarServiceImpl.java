@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,16 +53,14 @@ public class CarServiceImpl implements CarService {
         checkDuplications(carTO);
         repository.findById(carTO.getId()).orElseThrow(CarNotFoundException::new);
         driverRepository.findById(carTO.getDriverId()).orElseThrow(DriverNotFoundException::new);
-        return saveCar(carTO);
+        return mapper.carToResponse(repository.save(mapper.requestToCar(carTO)));
     }
 
     @Transactional
     public CarResponseTO saveCar(CarRequestTO carTO) {
         driverRepository.findById(carTO.getDriverId()).orElseThrow(DriverNotFoundException::new);
         checkDuplications(carTO);
-        carTO.setId(null);
-        Car saved = repository.save(mapper.requestToCar(carTO));
-        return mapper.carToResponse(saved);
+        return mapper.carToResponse(repository.save(mapper.requestToCar(carTO)));
     }
 
     @Transactional
@@ -78,7 +77,9 @@ public class CarServiceImpl implements CarService {
 
     private void checkDuplications(CarRequestTO carTO) {
         repository.findByRegistrationNumber(carTO.getRegistrationNumber()).ifPresent((car -> {
-            throw new DuplicateRegistrationNumberException();
+            if(!Objects.equals(car.getId(),carTO.getId())) {
+                throw new DuplicateRegistrationNumberException();
+            }
         }));
     }
 }

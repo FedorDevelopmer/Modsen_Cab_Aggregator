@@ -6,12 +6,15 @@ import com.modsen.software.driver.exception.CarNotFoundException;
 import com.modsen.software.driver.exception.DuplicateRegistrationNumberException;
 import com.modsen.software.driver.exception_handler.ExceptionHandling;
 import com.modsen.software.driver.service.impl.CarServiceImpl;
+import com.modsen.software.driver.validation.OnCreate;
+import com.modsen.software.driver.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -41,13 +44,13 @@ public class CarController {
     }
 
     @PutMapping
-    public ResponseEntity<CarResponseTO> update(@Valid @RequestBody CarRequestTO carTO) {
+    public ResponseEntity<CarResponseTO> update(@Validated(OnUpdate.class) @RequestBody CarRequestTO carTO) {
         CarResponseTO updatedCar = service.updateCar(carTO);
         return new ResponseEntity<>(updatedCar, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<CarResponseTO> save(@Valid @RequestBody CarRequestTO carTO) {
+    public ResponseEntity<CarResponseTO> save(@Validated(OnCreate.class) @RequestBody CarRequestTO carTO) {
         return new ResponseEntity<>(service.saveCar(carTO), HttpStatus.CREATED);
     }
 

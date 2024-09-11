@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,15 +48,13 @@ public class DriverServiceImpl {
     public DriverResponseTO updateDriver(DriverRequestTO driverTO) {
         repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
         checkDuplications(driverTO);
-        return saveDriver(driverTO);
+        return mapper.driverToResponse(repository.save(mapper.requestToDriver(driverTO)));
     }
 
     @Transactional
     public DriverResponseTO saveDriver(DriverRequestTO driverTO) {
         checkDuplications(driverTO);
-        driverTO.setId(null);
-        Driver saved = repository.save(mapper.requestToDriver(driverTO));
-        return mapper.driverToResponse(saved);
+        return mapper.driverToResponse(repository.save(mapper.requestToDriver(driverTO)));
     }
 
     @Transactional
@@ -72,10 +71,14 @@ public class DriverServiceImpl {
 
     private void checkDuplications(DriverRequestTO driverTO) {
         repository.findByEmail(driverTO.getEmail()).ifPresent(driver -> {
-            throw new DuplicateEmailException();
+            if(!Objects.equals(driver.getId(),driverTO.getId())) {
+                throw new DuplicateEmailException();
+            }
         });
         repository.findByPhoneNumber(driverTO.getPhoneNumber()).ifPresent(driver -> {
-            throw new DuplicatePhoneException();
+            if(!Objects.equals(driver.getId(),driverTO.getId())) {
+                throw new DuplicatePhoneException();
+            }
         });
     }
 }
