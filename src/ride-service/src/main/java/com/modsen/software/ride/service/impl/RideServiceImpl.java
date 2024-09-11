@@ -28,10 +28,10 @@ public class RideServiceImpl {
     @Transactional
     public List<RideResponseTO> getAllRides(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         return repository.findAll(PageRequest.of(pageNumber, pageSize,
-                         Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                         .stream()
-                         .map(mapper::rideToResponse)
-                         .collect(Collectors.toList());
+                        Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
+                .stream()
+                .map(mapper::rideToResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -55,9 +55,7 @@ public class RideServiceImpl {
 
     @Transactional
     public RideResponseTO saveRide(RideRequestTO rideTO) {
-        rideTO.setId(null);
-        Ride saved = repository.save(mapper.requestToRide(rideTO));
-        return mapper.rideToResponse(saved);
+        return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
     }
 
     @Transactional

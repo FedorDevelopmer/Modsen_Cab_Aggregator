@@ -15,8 +15,6 @@
 	<name>Cab Aggregator Project</name>
 	<description>Cab aggregator application, developed as Modsen intership project</description>
 	<modules>
-		<module>src/driver-service</module>
-		<module>src/passenger-service</module>
 		<module>src/ride-service</module>
 	</modules>
 	<properties>

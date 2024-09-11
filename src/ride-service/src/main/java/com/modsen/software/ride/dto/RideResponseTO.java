@@ -1,11 +1,9 @@
 package com.modsen.software.ride.dto;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Data

@@ -1,7 +1,6 @@
 package com.modsen.software.ride.entity;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
-import com.modsen.software.ride.service.RideService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Entity
