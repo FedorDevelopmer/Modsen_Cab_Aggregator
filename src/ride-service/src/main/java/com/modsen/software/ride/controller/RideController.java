@@ -2,6 +2,7 @@ package com.modsen.software.ride.controller;
 
 import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
+import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.exception_handler.ExceptionHandling;
 import com.modsen.software.ride.service.impl.RideServiceImpl;
@@ -53,6 +54,11 @@ public class RideController {
     public ResponseEntity<String> delete(@PathVariable Long id){
         service.deleteRide(id);
         return new ResponseEntity<>("Ride successfully deleted",HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<RideResponseTO> updateStatus(@PathVariable Long id, @RequestParam RideStatus status){
+        return new ResponseEntity<>(service.updateRideStatus(id,status),HttpStatus.OK);
     }
 
     @ExceptionHandler(RideNotFoundException.class)

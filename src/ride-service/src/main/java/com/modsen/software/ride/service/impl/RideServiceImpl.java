@@ -3,6 +3,7 @@ package com.modsen.software.ride.service.impl;
 import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.Ride;
+import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.mapper.RideMapper;
 import com.modsen.software.ride.repository.RideRepository;
@@ -42,7 +43,14 @@ public class RideServiceImpl {
     @Transactional
     public RideResponseTO updateRide(RideRequestTO rideTO) {
         repository.findById(rideTO.getId()).orElseThrow(RideNotFoundException::new);
-        return saveRide(rideTO);
+        return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
+    }
+
+    @Transactional
+    public RideResponseTO updateRideStatus(Long id, RideStatus status) {
+        Ride ride = repository.findById(id).orElseThrow(RideNotFoundException::new);
+        ride.setRideStatus(status);
+        return mapper.rideToResponse(repository.save(ride));
     }
 
     @Transactional
