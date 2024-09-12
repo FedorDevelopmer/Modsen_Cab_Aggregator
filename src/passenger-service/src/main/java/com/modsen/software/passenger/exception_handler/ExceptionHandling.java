@@ -1,21 +1,9 @@
 package com.modsen.software.passenger.exception_handler;
 
-import com.modsen.software.passenger.exception.DuplicateEmailException;
-import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
-import com.modsen.software.passenger.exception.PassengerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import java.sql.Date;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 

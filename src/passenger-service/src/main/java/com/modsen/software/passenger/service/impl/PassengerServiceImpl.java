@@ -15,8 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,10 +31,10 @@ public class PassengerServiceImpl {
     @Transactional
     public List<PassengerResponseTO> getAllPassengers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         return repository.findAll(PageRequest.of(pageNumber, pageSize,
-                         Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                         .stream()
-                         .map(mapper::passengerToResponse)
-                         .collect(Collectors.toList());
+                        Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
+                .stream()
+                .map(mapper::passengerToResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -68,8 +68,16 @@ public class PassengerServiceImpl {
         repository.delete(mapper.responseToPassenger(findPassengerById(id)));
     }
 
-    private void checkDuplications(PassengerRequestTO passengerTO){
-        repository.getByEmail(passengerTO.getEmail()).ifPresent((passenger -> {throw new DuplicateEmailException();}));
-        repository.getByPhoneNumber(passengerTO.getPhoneNumber()).ifPresent((passenger -> {throw new DuplicatePhoneNumberException();}));
+    private void checkDuplications(PassengerRequestTO passengerTO) {
+        repository.getByEmail(passengerTO.getEmail()).ifPresent((passenger -> {
+            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
+                throw new DuplicateEmailException();
+            }
+        }));
+        repository.getByPhoneNumber(passengerTO.getPhoneNumber()).ifPresent((passenger -> {
+            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
+                throw new DuplicatePhoneNumberException();
+            }
+        }));
     }
 }
