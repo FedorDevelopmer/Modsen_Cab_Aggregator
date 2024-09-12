@@ -22,7 +22,7 @@
 		<developer/>
 	</developers>
     <modules>
-        <module>src/driver-service</module>
+        <module>src/rating-service</module>
     </modules>
     <scm>
 		<connection/>
@@ -32,6 +32,13 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
+		<mapstruct.version>1.6.0</mapstruct.version>
+		<mapstruct-processor.version>1.6.0</mapstruct-processor.version>
+		<hibernate.validator.version>8.0.1.Final</hibernate.validator.version>
+		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
+		<spring-data-jpa.version>3.3.3</spring-data-jpa.version>
+		<liquibase-core.version>4.29.0</liquibase-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -47,6 +54,55 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>${jakarta.validation-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${mapstruct-processor.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate.validator.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>${jakarta.persistence-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>${spring-data-jpa.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase-core.version}</version>
 		</dependency>
 	</dependencies>
 
