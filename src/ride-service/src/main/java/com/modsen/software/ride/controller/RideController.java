@@ -6,6 +6,7 @@ import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.exception_handler.ExceptionHandling;
 import com.modsen.software.ride.service.impl.RideServiceImpl;
+import com.modsen.software.ride.validation.OnCreate;
 import com.modsen.software.ride.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class RideController {
     }
 
     @PostMapping
-    public ResponseEntity<RideResponseTO> save(@Validated @RequestBody RideRequestTO rideTO) {
+    public ResponseEntity<RideResponseTO> save(@Validated(OnCreate.class) @RequestBody RideRequestTO rideTO) {
         return new ResponseEntity<>(service.saveRide(rideTO), HttpStatus.CREATED);
     }
 

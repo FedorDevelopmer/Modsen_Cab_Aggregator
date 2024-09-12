@@ -1,6 +1,7 @@
 package com.modsen.software.ride.dto;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
+import com.modsen.software.ride.validation.OnCreate;
 import com.modsen.software.ride.validation.OnUpdate;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -22,29 +23,29 @@ public class RideRequestTO {
     @Min(value = 1, groups = OnUpdate.class)
     private Long id;
 
-    @NotNull
-    @Min(1)
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 1, groups = {OnUpdate.class, OnCreate.class})
     private Long driverId;
 
-    @NotNull
-    @Min(1)
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 1, groups = OnCreate.class)
     private Long passengerId;
 
-    @NotNull
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private String departureAddress;
 
-    @NotNull
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private String destinationAddress;
 
-    @NotNull
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private RideStatus rideStatus;
 
-    @NotNull
-    @Past
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @Past(groups = {OnUpdate.class, OnCreate.class})
     private LocalDateTime rideOrderTime;
 
-    @NotNull
-    @DecimalMin(value = "0.0", inclusive = false)
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @DecimalMin(value = "0.0", inclusive = false, groups = {OnUpdate.class, OnCreate.class})
     private BigDecimal ridePrice;
 
 }
