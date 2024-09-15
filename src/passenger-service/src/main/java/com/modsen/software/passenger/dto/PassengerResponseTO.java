@@ -3,6 +3,7 @@ package com.modsen.software.passenger.dto;
 import com.modsen.software.passenger.entity.enumeration.Gender;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +20,9 @@ public class PassengerResponseTO {
 
     private String phoneNumber;
 
+    private BigDecimal rating;
+
     private Gender gender;
 
     private RemoveStatus removeStatus;
-
 }

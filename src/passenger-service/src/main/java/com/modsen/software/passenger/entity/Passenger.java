@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "passengers")
 public class Passenger {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "passenger_id")
@@ -28,6 +31,9 @@ public class Passenger {
 
     @Column(name = "passenger_phone")
     private String phoneNumber;
+
+    @Column(name = "passenger_rating")
+    private BigDecimal rating;
 
     @Column(name = "passenger_gender")
     private Gender gender;

@@ -7,21 +7,22 @@ import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.exception.DuplicateEmailException;
 import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
 import com.modsen.software.passenger.exception.PassengerNotFoundException;
+import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.mapper.PassengerMapper;
 import com.modsen.software.passenger.repository.PassengerRepository;
+import com.modsen.software.passenger.service.PassengerService;
+import com.modsen.software.passenger.specification.PassengerSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class PassengerServiceImpl {
+public class PassengerServiceImpl implements PassengerService {
     @Autowired
     private PassengerRepository repository;
 
@@ -29,12 +30,13 @@ public class PassengerServiceImpl {
     private PassengerMapper mapper;
 
     @Transactional
-    public List<PassengerResponseTO> getAllPassengers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        return repository.findAll(PageRequest.of(pageNumber, pageSize,
-                        Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                .stream()
-                .map(mapper::passengerToResponse)
-                .collect(Collectors.toList());
+    public Page<PassengerResponseTO> getAllPassengers(PassengerFilter filter, Pageable pageable) {
+        Specification<Passenger> spec = Specification.where(PassengerSpecification.hasEmail(filter.getEmail()))
+                .and(PassengerSpecification.hasName(filter.getName()))
+                .and(PassengerSpecification.hasGender(filter.getGender()))
+                .and(PassengerSpecification.hasPhone(filter.getPhoneNumber()))
+                .and(PassengerSpecification.hasRemoveStatus(filter.getRemoveStatus()));
+        return repository.findAll(spec,pageable).map((item)-> mapper.passengerToResponse(item));
     }
 
     @Transactional
@@ -65,7 +67,7 @@ public class PassengerServiceImpl {
 
     @Transactional
     public void deletePassenger(Long id) {
-        repository.delete(mapper.responseToPassenger(findPassengerById(id)));
+        repository.delete(repository.findById(id).orElseThrow(PassengerNotFoundException::new));
     }
 
     private void checkDuplications(PassengerRequestTO passengerTO) {

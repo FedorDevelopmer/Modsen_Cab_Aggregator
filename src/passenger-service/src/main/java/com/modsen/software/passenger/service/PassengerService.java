@@ -2,12 +2,13 @@ package com.modsen.software.passenger.service;
 
 import com.modsen.software.passenger.dto.PassengerRequestTO;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
-
-import java.util.List;
+import com.modsen.software.passenger.filter.PassengerFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PassengerService {
 
-    List<PassengerResponseTO> getAllPassengers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    Page<PassengerResponseTO> getAllPassengers(PassengerFilter filter, Pageable pageable);
 
     PassengerResponseTO findPassengerById(Long id);
 
