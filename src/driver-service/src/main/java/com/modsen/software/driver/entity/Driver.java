@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -16,7 +18,7 @@ import java.sql.Date;
 @Getter
 @Setter
 @Table(name = "drivers")
-public class Driver {
+public class Driver implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "driver_id")
@@ -34,6 +36,9 @@ public class Driver {
     @Column(name = "driver_phone")
     private String phoneNumber;
 
+    @Column(name = "driver_rating")
+    private BigDecimal rating;
+
     @Column(name = "driver_gender")
     private Gender gender;
 
@@ -43,5 +48,6 @@ public class Driver {
     @Column(name = "driver_remove_status")
     private RemoveStatus removeStatus;
 
-
+    @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
+    private Set<Car> cars;
 }

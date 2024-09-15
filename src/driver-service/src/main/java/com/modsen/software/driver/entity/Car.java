@@ -7,9 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import java.io.Serializable;
 import java.sql.Date;
-
 
 @Entity
 @NoArgsConstructor
@@ -17,14 +16,14 @@ import java.sql.Date;
 @Getter
 @Setter
 @Table(name = "cars")
-public class Car {
+public class Car implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "car_id")
     private Long id;
 
-    @Column(name = "car_driver")
+    @Column(name="car_driver")
     private Long driverId;
 
     @Column(name = "car_color")
@@ -44,4 +43,8 @@ public class Car {
 
     @Column(name = "car_remove_status")
     private RemoveStatus removeStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
 }

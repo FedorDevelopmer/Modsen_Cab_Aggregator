@@ -4,13 +4,12 @@ import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.validation.OnCreate;
 import com.modsen.software.driver.validation.OnUpdate;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.*;
-
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -30,10 +29,16 @@ public class DriverRequestTO {
     private String surname;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
+    @Email
     private String email;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
+    @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$",groups = {OnUpdate.class, OnCreate.class})
     private String phoneNumber;
+
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @DecimalMin(value = "1.0")
+    private BigDecimal rating;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private Gender gender;
@@ -44,4 +49,7 @@ public class DriverRequestTO {
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private RemoveStatus removeStatus;
+
+    @Valid
+    private Set<DriverRelatedCarRequestTO> cars;
 }

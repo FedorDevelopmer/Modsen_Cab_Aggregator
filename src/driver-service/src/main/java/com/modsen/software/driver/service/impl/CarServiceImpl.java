@@ -7,20 +7,20 @@ import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.exception.CarNotFoundException;
 import com.modsen.software.driver.exception.DriverNotFoundException;
 import com.modsen.software.driver.exception.DuplicateRegistrationNumberException;
+import com.modsen.software.driver.filter.CarFilter;
 import com.modsen.software.driver.mapper.CarMapper;
 import com.modsen.software.driver.repository.CarRepository;
 import com.modsen.software.driver.repository.DriverRepository;
 import com.modsen.software.driver.service.CarService;
+import com.modsen.software.driver.specification.CarSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -34,12 +34,16 @@ public class CarServiceImpl implements CarService {
     private CarMapper mapper;
 
     @Transactional
-    public List<CarResponseTO> getAllCars(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        return repository.findAll(PageRequest.of(pageNumber, pageSize,
-                        Sort.by(Sort.Direction.valueOf(sortOrder), sortBy)))
-                        .stream()
-                        .map(mapper::carToResponse)
-                        .collect(Collectors.toList());
+    public Page<CarResponseTO> getAllCars(CarFilter filter, Pageable pageable) {
+        Specification<Car> spec = Specification.where(CarSpecification.hasBrand(filter.getBrand()))
+                .and(CarSpecification.hasColor(filter.getColor()))
+                .and(CarSpecification.hasRegistrationNumber(filter.getRegistrationNumber()))
+                .and(CarSpecification.hasInspectionDateEarlier(filter.getInspectionDateEarlier()))
+                .and(CarSpecification.hasInspectionDate(filter.getInspectionDate()))
+                .and(CarSpecification.hasInspectionDateLater(filter.getInspectionDateLater()))
+                .and(CarSpecification.hasInspectionDurationMonth(filter.getInspectionDurationMonth())
+                .and(CarSpecification.hasRemoveStatus(filter.getRemoveStatus())));
+        return repository.findAll(spec, pageable).map((item)-> mapper.carToResponse(item));
     }
 
     @Transactional

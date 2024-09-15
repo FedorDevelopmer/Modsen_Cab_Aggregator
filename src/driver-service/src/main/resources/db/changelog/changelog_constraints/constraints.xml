@@ -35,5 +35,4 @@
         <!-- Cars Table -->
         <addUniqueConstraint tableName="cars" columnNames="car_reg_number"/>
     </changeSet>
-
 </databaseChangeLog>

@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  postgresql:
+  postgresql_drivers:
     container_name: drivers_postgres_db
     image: postgres
     environment:

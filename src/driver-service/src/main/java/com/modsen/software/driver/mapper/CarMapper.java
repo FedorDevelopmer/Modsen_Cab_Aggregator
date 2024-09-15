@@ -2,6 +2,7 @@ package com.modsen.software.driver.mapper;
 
 import com.modsen.software.driver.dto.CarRequestTO;
 import com.modsen.software.driver.dto.CarResponseTO;
+import com.modsen.software.driver.dto.DriverRelatedCarRequestTO;
 import com.modsen.software.driver.entity.Car;
 import org.mapstruct.Mapper;
 
@@ -14,4 +15,7 @@ public interface CarMapper {
     CarRequestTO carToRequest(Car car);
 
     Car requestToCar(CarRequestTO carRequestTo);
+
+    Car driverRelatedRequestToCar(DriverRelatedCarRequestTO relatedCarRequestTo);
+
 }

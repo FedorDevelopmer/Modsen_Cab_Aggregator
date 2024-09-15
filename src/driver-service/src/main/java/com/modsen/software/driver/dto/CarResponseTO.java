@@ -3,7 +3,6 @@ package com.modsen.software.driver.dto;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import lombok.*;
-
 import java.sql.Date;
 
 @Data
@@ -28,5 +27,4 @@ public class CarResponseTO {
     private Integer inspectionDurationMonth;
 
     private RemoveStatus removeStatus;
-
 }

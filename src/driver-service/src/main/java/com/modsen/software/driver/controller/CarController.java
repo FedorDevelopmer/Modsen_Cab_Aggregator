@@ -2,15 +2,22 @@ package com.modsen.software.driver.controller;
 
 import com.modsen.software.driver.dto.CarRequestTO;
 import com.modsen.software.driver.dto.CarResponseTO;
+import com.modsen.software.driver.entity.enumeration.Color;
+import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.exception.CarNotFoundException;
+import com.modsen.software.driver.exception.DriverNotFoundException;
 import com.modsen.software.driver.exception.DuplicateRegistrationNumberException;
 import com.modsen.software.driver.exception_handler.ExceptionHandling;
+import com.modsen.software.driver.filter.CarFilter;
 import com.modsen.software.driver.service.impl.CarServiceImpl;
 import com.modsen.software.driver.validation.OnCreate;
 import com.modsen.software.driver.validation.OnUpdate;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,21 +25,29 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.List;
+import java.sql.Date;
+import java.util.Objects;
 
 @Controller
-@RequestMapping("/api/v1.0/car")
+@RequestMapping("/api/v1/cars")
 public class CarController {
     @Autowired
     private CarServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<CarResponseTO>> getAll(@RequestParam(required = false, defaultValue = "0") @Min(0) Integer pageNumber,
-                                                      @RequestParam(required = false, defaultValue = "100") @Min(1) Integer pageSize,
-                                                      @RequestParam(required = false, defaultValue = "id") String sortBy,
-                                                      @RequestParam(required = false, defaultValue = "ASC") String sortOrder) {
-        List<CarResponseTO> cars = service.getAllCars(pageNumber, pageSize, sortBy, sortOrder);
+    public ResponseEntity<Page<CarResponseTO>> getAll(@RequestParam(required = false) Color color,
+                                                      @RequestParam(required = false) String brand,
+                                                      @RequestParam(required = false) String registrationNumber,
+                                                      @RequestParam(required = false) Date inspectionDateEarlier,
+                                                      @RequestParam(required = false) Date inspectionDate,
+                                                      @RequestParam(required = false) Date inspectionDateLater,
+                                                      @RequestParam(required = false) Integer inspectionDurationMonth,
+                                                      @RequestParam(required = false) RemoveStatus removeStatus,
+                                                      @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+        CarFilter filter = new CarFilter(color, brand, registrationNumber, inspectionDateEarlier,
+                                         inspectionDate, inspectionDateLater, inspectionDurationMonth,
+                                         removeStatus);
+        Page<CarResponseTO> cars = service.getAllCars(filter, pageable);
         return new ResponseEntity<>(cars, HttpStatus.OK);
     }
 
@@ -55,23 +70,27 @@ public class CarController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         service.softDeleteCar(id);
+        return new ResponseEntity<>("Car was successfully delete(softly).",HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler(CarNotFoundException.class)
+    @ExceptionHandler({CarNotFoundException.class, DriverNotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e, request);
+        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
     @ExceptionHandler(DuplicateRegistrationNumberException.class)
     public ResponseEntity<Object> handleDuplicateDataException(RuntimeException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.CONFLICT, e, request);
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e, request);
+        String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
+                        e.getBindingResult().getFieldError()).getField(),
+                        e.getBindingResult().getFieldError().getRejectedValue());
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 
 }

@@ -1,15 +1,14 @@
 package com.modsen.software.driver.dto;
 
+import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.validation.OnCreate;
 import com.modsen.software.driver.validation.OnUpdate;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.*;
-
+import org.springframework.validation.annotation.Validated;
 import java.sql.Date;
 
 @Data
@@ -17,6 +16,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Validated
 public class CarRequestTO {
 
     @NotNull(groups = OnUpdate.class)
@@ -34,6 +34,7 @@ public class CarRequestTO {
     private String brand;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
+    @Pattern(regexp = "^[1-7] *TAX *[0-9]{4}$",groups = {OnUpdate.class, OnCreate.class})
     private String registrationNumber;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
@@ -46,4 +47,7 @@ public class CarRequestTO {
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
     private RemoveStatus removeStatus;
+
+    @Valid
+    private Driver driver;
 }

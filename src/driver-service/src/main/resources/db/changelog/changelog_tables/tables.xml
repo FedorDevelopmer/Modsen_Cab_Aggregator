@@ -28,6 +28,11 @@
             <column name="car_inspection_duration_month" type="int"/>
             <column name="car_remove_status" type="varchar"/>
         </createTable>
+    </changeSet>
 
+    <changeSet id="addition_of_driver_rating" author="Fyodor">
+        <addColumn tableName="drivers">
+            <column name="rating" type="decimal(2,2)"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

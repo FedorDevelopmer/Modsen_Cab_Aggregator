@@ -2,12 +2,13 @@ package com.modsen.software.driver.service;
 
 import com.modsen.software.driver.dto.CarRequestTO;
 import com.modsen.software.driver.dto.CarResponseTO;
-
-import java.util.List;
+import com.modsen.software.driver.filter.CarFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CarService {
 
-    List<CarResponseTO> getAllCars(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    Page<CarResponseTO> getAllCars(CarFilter filter, Pageable pageable);
 
     CarResponseTO findCarById(Long id);
 
