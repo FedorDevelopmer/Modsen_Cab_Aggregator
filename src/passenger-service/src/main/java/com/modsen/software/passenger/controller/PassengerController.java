@@ -6,11 +6,15 @@ import com.modsen.software.passenger.exception.DuplicateEmailException;
 import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
 import com.modsen.software.passenger.exception.PassengerNotFoundException;
 import com.modsen.software.passenger.exception_handler.ExceptionHandling;
+import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
 import com.modsen.software.passenger.validation.OnCreate;
 import com.modsen.software.passenger.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,21 +22,20 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/api/v1.0/passenger")
+@RequestMapping("/api/v1/passengers")
 public class PassengerController {
     @Autowired
     private PassengerServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<PassengerResponseTO>> getAll(@RequestParam(required = false, defaultValue = "0") @Min(0) Integer pageNumber,
-                                                            @RequestParam(required = false, defaultValue = "100") @Min(1) Integer pageSize,
-                                                            @RequestParam(required = false, defaultValue = "id") String sortBy,
-                                                            @RequestParam(required = false, defaultValue = "ASC") String sortOrder) {
-        List<PassengerResponseTO> passengers = service.getAllPassengers(pageNumber, pageSize, sortBy, sortOrder);
+    public ResponseEntity<List<PassengerResponseTO>> getAll(@RequestBody(required = false) Optional<PassengerFilter> filter,
+                                                            @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+        List<PassengerResponseTO> passengers = filter.isPresent() ? service.getAllPassengers(filter.get(), pageable)
+                                                         : service.getAllPassengers(new PassengerFilter(), pageable);
         return new ResponseEntity<>(passengers, HttpStatus.OK);
     }
 

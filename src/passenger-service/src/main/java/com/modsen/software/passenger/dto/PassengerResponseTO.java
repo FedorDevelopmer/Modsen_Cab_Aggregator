@@ -22,5 +22,4 @@ public class PassengerResponseTO {
     private Gender gender;
 
     private RemoveStatus removeStatus;
-
 }

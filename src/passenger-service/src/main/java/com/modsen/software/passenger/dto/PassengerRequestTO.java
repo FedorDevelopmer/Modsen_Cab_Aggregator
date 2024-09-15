@@ -20,7 +20,6 @@ public class PassengerRequestTO {
     @Min(value = 1, groups = OnUpdate.class)
     private Long id;
 
-
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
     private String name;
 

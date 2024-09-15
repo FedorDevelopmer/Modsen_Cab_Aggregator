@@ -15,6 +15,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "passengers")
 public class Passenger {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "passenger_id")
