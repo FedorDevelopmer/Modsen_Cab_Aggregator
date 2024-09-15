@@ -7,11 +7,11 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface RatingScoreMapper {
-    RatingScoreResponseTO ratingToResponse(RatingScore driver);
+    RatingScoreResponseTO ratingScoreToResponse(RatingScore driver);
 
-    RatingScore responseToRide(RatingScoreResponseTO driverResponseTo);
+    RatingScore responseToRatingScore(RatingScoreResponseTO driverResponseTo);
 
-    RatingScoreRequestTO ratingToRequest(RatingScore driver);
+    RatingScoreRequestTO ratingScoreToRequest(RatingScore driver);
 
-    RatingScore requestToRide(RatingScoreRequestTO driverRequestTo);
+    RatingScore requestToRatingScore(RatingScoreRequestTO driverRequestTo);
 }

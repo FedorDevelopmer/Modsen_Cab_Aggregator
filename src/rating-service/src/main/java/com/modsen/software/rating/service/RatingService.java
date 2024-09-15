@@ -2,19 +2,19 @@ package com.modsen.software.rating.service;
 
 import com.modsen.software.rating.dto.RatingScoreRequestTO;
 import com.modsen.software.rating.dto.RatingScoreResponseTO;
-
-import java.util.List;
+import com.modsen.software.rating.filter.RatingScoreFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RatingService {
 
-    List<RatingScoreResponseTO> getAllRides(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    Page<RatingScoreResponseTO> getAllRatingScores(RatingScoreFilter filter, Pageable pageable);
 
-    RatingScoreResponseTO findRideById(Long id);
+    RatingScoreResponseTO findRatingScoreById(Long id);
 
-    RatingScoreResponseTO saveRide(RatingScoreRequestTO carRequest);
+    RatingScoreResponseTO saveRatingScore(RatingScoreRequestTO carRequest);
 
-    RatingScoreResponseTO updateRide(RatingScoreRequestTO carRequest);
+    RatingScoreResponseTO updateRatingScore(RatingScoreRequestTO carRequest);
 
-    void deleteRide(Long id);
-
+    void deleteRatingScore(Long id);
 }
