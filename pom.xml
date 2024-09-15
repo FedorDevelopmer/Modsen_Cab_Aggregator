@@ -27,6 +27,7 @@
 		<spring-data-jpa.version>3.3.3</spring-data-jpa.version>
 		<liquibase-core.version>4.29.0</liquibase-core.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

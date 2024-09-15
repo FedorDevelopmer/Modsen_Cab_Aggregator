@@ -5,11 +5,15 @@ import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.exception_handler.ExceptionHandling;
+import com.modsen.software.ride.filter.RideFilter;
 import com.modsen.software.ride.service.impl.RideServiceImpl;
 import com.modsen.software.ride.validation.OnCreate;
 import com.modsen.software.ride.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,21 +21,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/api/v1.0/ride")
+@RequestMapping("/api/v1/rides")
 public class RideController {
     @Autowired
     private RideServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<RideResponseTO>> getAll(@RequestParam(required = false, defaultValue = "0") @Min(0) Integer pageNumber,
-                                                       @RequestParam(required = false, defaultValue = "100") @Min(1) Integer pageSize,
-                                                       @RequestParam(required = false, defaultValue = "id") String sortBy,
-                                                       @RequestParam(required = false, defaultValue = "ASC") String sortOrder) {
-        List<RideResponseTO> rides = service.getAllRides(pageNumber, pageSize, sortBy, sortOrder);
+    public ResponseEntity<List<RideResponseTO>> getAll(@RequestBody(required = false) Optional<RideFilter> filter,
+                                                       @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+        List<RideResponseTO> rides = filter.isPresent() ? service.getAllRides(filter.get(),pageable) : service.getAllRides(new RideFilter(),pageable);
         return new ResponseEntity<>(rides, HttpStatus.OK);
     }
 

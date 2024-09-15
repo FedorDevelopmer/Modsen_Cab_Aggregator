@@ -2,7 +2,6 @@ package com.modsen.software.ride.dto;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -28,5 +27,4 @@ public class RideResponseTO {
     private LocalDateTime rideOrderTime;
 
     private BigDecimal ridePrice;
-
 }

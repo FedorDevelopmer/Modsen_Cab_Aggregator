@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface RideMapper {
+
     RideResponseTO rideToResponse(Ride driver);
 
     Ride responseToRide(RideResponseTO driverResponseTo);
