@@ -12,12 +12,11 @@ import com.modsen.software.ride.service.RideService;
 import com.modsen.software.ride.specification.RideSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RideServiceImpl implements RideService {
@@ -28,22 +27,19 @@ public class RideServiceImpl implements RideService {
     private RideMapper mapper;
 
     @Transactional
-    public List<RideResponseTO> getAllRides(RideFilter filter, Pageable pageable) {
+    public Page<RideResponseTO> getAllRides(RideFilter filter, Pageable pageable) {
         Specification<Ride> spec = Specification.where(RideSpecification.hasDriverId(filter.getDriverId())
                         .and(RideSpecification.hasPassengerId(filter.getPassengerId()))
                         .and(RideSpecification.hasDepartureAddress(filter.getDepartureAddress()))
                         .and(RideSpecification.hasDestinationAddress(filter.getDestinationAddress()))
                         .and(RideSpecification.hasRideStatus(filter.getRideStatus()))
                         .and(RideSpecification.hasRidePrice(filter.getRidePrice()))
-                        .and(RideSpecification.hasRidePriceLowerThan(filter.getRidePriceAndLower()))
-                        .and(RideSpecification.hasRidePriceHigherThan(filter.getRidePriceAndHigher()))
+                        .and(RideSpecification.hasRidePriceLowerThan(filter.getRidePriceLower()))
+                        .and(RideSpecification.hasRidePriceHigherThan(filter.getRidePriceHigher()))
                         .and(RideSpecification.hasRideOrderTime(filter.getRideOrderTime()))
-                        .and(RideSpecification.hasRideOrderTimeEarlier(filter.getRideOrderTimeAndEarlier()))
-                        .and(RideSpecification.hasRideOrderTimeLater(filter.getRideOrderTimeAndLater())));
-        return repository.findAll(spec,pageable)
-                .stream()
-                .map(mapper::rideToResponse)
-                .collect(Collectors.toList());
+                        .and(RideSpecification.hasRideOrderTimeEarlier(filter.getRideOrderTimeEarlier()))
+                        .and(RideSpecification.hasRideOrderTimeLater(filter.getRideOrderTimeLater())));
+        return repository.findAll(spec,pageable).map((item)-> mapper.rideToResponse(item));
     }
 
     @Transactional

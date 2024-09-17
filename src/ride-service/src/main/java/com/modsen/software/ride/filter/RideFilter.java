@@ -24,15 +24,15 @@ public class RideFilter {
 
     private LocalDateTime rideOrderTime = null;
 
-    private LocalDateTime rideOrderTimeAndEarlier = null;
+    private LocalDateTime rideOrderTimeEarlier = null;
 
-    private LocalDateTime rideOrderTimeAndLater = null;
+    private LocalDateTime rideOrderTimeLater = null;
 
     private RideStatus rideStatus = null;
 
     private BigDecimal ridePrice = null;
 
-    private BigDecimal ridePriceAndLower = null;
+    private BigDecimal ridePriceLower = null;
 
-    private BigDecimal ridePriceAndHigher = null;
+    private BigDecimal ridePriceHigher = null;
 }

@@ -11,6 +11,7 @@ import com.modsen.software.ride.validation.OnCreate;
 import com.modsen.software.ride.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,8 +22,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/api/v1/rides")
@@ -31,9 +33,22 @@ public class RideController {
     private RideServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<RideResponseTO>> getAll(@RequestBody(required = false) Optional<RideFilter> filter,
+    public ResponseEntity<Page<RideResponseTO>> getAll(@RequestParam(required = false) Long driverId,
+                                                       @RequestParam(required = false) Long passengerId,
+                                                       @RequestParam(required = false) String departureAddress,
+                                                       @RequestParam(required = false) String destinationAddress,
+                                                       @RequestParam(required = false) LocalDateTime rideOrderTime,
+                                                       @RequestParam(required = false) LocalDateTime rideOrderTimeEarlier,
+                                                       @RequestParam(required = false) LocalDateTime rideOrderTimeLater,
+                                                       @RequestParam(required = false) RideStatus rideStatus,
+                                                       @RequestParam(required = false) BigDecimal ridePrice,
+                                                       @RequestParam(required = false) BigDecimal ridePriceHigher,
+                                                       @RequestParam(required = false) BigDecimal ridePriceLower,
                                                        @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
-        List<RideResponseTO> rides = filter.isPresent() ? service.getAllRides(filter.get(),pageable) : service.getAllRides(new RideFilter(),pageable);
+        RideFilter filter = new RideFilter(driverId, passengerId, departureAddress, destinationAddress,
+                                           rideOrderTime,rideOrderTimeEarlier,rideOrderTimeLater,rideStatus,
+                                           ridePrice,ridePriceLower,ridePriceHigher);
+        Page<RideResponseTO> rides = service.getAllRides(filter, pageable);
         return new ResponseEntity<>(rides, HttpStatus.OK);
     }
 
@@ -67,11 +82,14 @@ public class RideController {
 
     @ExceptionHandler(RideNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e, request);
+        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e, request);
+        String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
+                        e.getBindingResult().getFieldError()).getField(),
+                        e.getBindingResult().getFieldError().getRejectedValue());
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 }
