@@ -2,6 +2,8 @@ package com.modsen.software.passenger.controller;
 
 import com.modsen.software.passenger.dto.PassengerRequestTO;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
+import com.modsen.software.passenger.entity.enumeration.Gender;
+import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.exception.DuplicateEmailException;
 import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
 import com.modsen.software.passenger.exception.PassengerNotFoundException;
@@ -12,6 +14,7 @@ import com.modsen.software.passenger.validation.OnCreate;
 import com.modsen.software.passenger.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,8 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/api/v1/passengers")
@@ -32,10 +34,14 @@ public class PassengerController {
     private PassengerServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<PassengerResponseTO>> getAll(@RequestBody(required = false) Optional<PassengerFilter> filter,
-                                                            @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
-        List<PassengerResponseTO> passengers = filter.isPresent() ? service.getAllPassengers(filter.get(), pageable)
-                                                         : service.getAllPassengers(new PassengerFilter(), pageable);
+    public ResponseEntity<Page<PassengerResponseTO>> getAll(@RequestParam(required = false) String name,
+                                                            @RequestParam(required = false) String email,
+                                                            @RequestParam(required = false) String phoneNumber,
+                                                            @RequestParam(required = false) Gender gender,
+                                                            @RequestParam(required = false) RemoveStatus removeStatus,
+                                                            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        PassengerFilter filter = new PassengerFilter(name,email,phoneNumber,gender,removeStatus);
+        Page<PassengerResponseTO> passengers = service.getAllPassengers(filter, pageable);
         return new ResponseEntity<>(passengers, HttpStatus.OK);
     }
 
@@ -64,16 +70,19 @@ public class PassengerController {
 
     @ExceptionHandler(PassengerNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e, request);
+        return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
     @ExceptionHandler({DuplicateEmailException.class, DuplicatePhoneNumberException.class})
     public ResponseEntity<Object> handleDuplicationException(RuntimeException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.CONFLICT, e, request);
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
-        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e, request);
+        String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
+                        e.getBindingResult().getFieldError()).getField(),
+                        e.getBindingResult().getFieldError().getRejectedValue());
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 }

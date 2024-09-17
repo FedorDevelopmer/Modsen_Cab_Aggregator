@@ -14,13 +14,12 @@ import com.modsen.software.passenger.service.PassengerService;
 import com.modsen.software.passenger.specification.PassengerSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PassengerServiceImpl implements PassengerService {
@@ -31,16 +30,13 @@ public class PassengerServiceImpl implements PassengerService {
     private PassengerMapper mapper;
 
     @Transactional
-    public List<PassengerResponseTO> getAllPassengers(PassengerFilter filter, Pageable pageable) {
+    public Page<PassengerResponseTO> getAllPassengers(PassengerFilter filter, Pageable pageable) {
         Specification<Passenger> spec = Specification.where(PassengerSpecification.hasEmail(filter.getEmail()))
                 .and(PassengerSpecification.hasName(filter.getName()))
                 .and(PassengerSpecification.hasGender(filter.getGender()))
                 .and(PassengerSpecification.hasPhone(filter.getPhoneNumber()))
                 .and(PassengerSpecification.hasRemoveStatus(filter.getRemoveStatus()));
-        return repository.findAll(spec,pageable)
-                .stream()
-                .map(mapper::passengerToResponse)
-                .collect(Collectors.toList());
+        return repository.findAll(spec,pageable).map((item)-> mapper.passengerToResponse(item));
     }
 
     @Transactional
