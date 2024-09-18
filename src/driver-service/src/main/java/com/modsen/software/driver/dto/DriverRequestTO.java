@@ -29,7 +29,7 @@ public class DriverRequestTO {
     private String surname;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
-    @Email
+    @Email(groups = {OnUpdate.class, OnCreate.class})
     private String email;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})

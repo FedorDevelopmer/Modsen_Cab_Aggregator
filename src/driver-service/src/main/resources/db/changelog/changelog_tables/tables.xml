@@ -32,7 +32,7 @@
 
     <changeSet id="addition_of_driver_rating" author="Fyodor">
         <addColumn tableName="drivers">
-            <column name="rating" type="decimal(2,2)"/>
+            <column name="driver_rating" type="decimal(2,2)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
