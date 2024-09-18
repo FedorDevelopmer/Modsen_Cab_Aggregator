@@ -30,8 +30,8 @@ public class PassengerRequestTO {
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$",groups = {OnUpdate.class, OnCreate.class})
     private String phoneNumber;
 
-    @NotNull
-    @DecimalMin(value = "1.00")
+    @NotNull(groups = {OnUpdate.class, OnCreate.class})
+    @DecimalMin(value = "1.00", groups = {OnUpdate.class, OnCreate.class})
     private BigDecimal rating;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
