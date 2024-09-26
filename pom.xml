@@ -15,8 +15,9 @@
     <name>Cab Aggregator Project</name>
 	<description>Cab aggregator application, developed as Modsen intership project</description>
     <modules>
-        <module>src/passenger-service</module>
-	</modules>
+        <module>src/passenger-service</module
+        <module>src/driver-service</module>
+    </modules>
 	<properties>
 		<java.version>17</java.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
