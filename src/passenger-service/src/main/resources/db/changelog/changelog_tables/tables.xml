@@ -1,0 +1,24 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="basic_tables_setup" author="Fyodor">
+        <createTable tableName="passengers">
+            <column name="passenger_id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="passenger_name" type="varchar"/>
+            <column name="passenger_email" type="varchar"/>
+            <column name="passenger_gender" type="varchar"/>
+            <column name="passenger_phone" type="varchar"/>
+            <column name="passenger_remove_status" type="varchar"/>
+        </createTable>
+
+    </changeSet>
+    
+    <changeSet id="addition_of_passenger_rating" author="Fyodor">
+        <addColumn tableName="passengers">
+            <column name="passenger_rating" type="decimal(2,2)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
