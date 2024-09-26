@@ -1,0 +1,20 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="basic_tables_setup" author="Fyodor">
+        <!-- Passengers Table -->
+        <addNotNullConstraint tableName="passengers" columnName="passenger_name"/>
+        <addNotNullConstraint tableName="passengers" columnName="passenger_email"/>
+        <addNotNullConstraint tableName="passengers" columnName="passenger_gender"/>
+        <addNotNullConstraint tableName="passengers" columnName="passenger_phone"/>
+        <addNotNullConstraint tableName="passengers" columnName="passenger_remove_status"/>
+
+    </changeSet>
+
+    <changeSet id="additional_unique_constraints" author="Fyodor">
+        <!-- Passengers Table -->
+        <addUniqueConstraint tableName="passengers" columnNames="passenger_email"/>
+        <addUniqueConstraint tableName="passengers" columnNames="passenger_phone"/>
+    </changeSet>
+</databaseChangeLog>
