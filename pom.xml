@@ -8,13 +8,14 @@
 		<version>3.3.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.modsen-software</groupId>
+	<groupId>com.modsen.software</groupId>
 	<artifactId>cab-aggregator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Cab Aggregator Project</name>
 	<description>Cab aggregator application, developed as Modsen intership project</description>
     <modules>
+        <module>src/passenger-service</module
         <module>src/driver-service</module>
     </modules>
 	<properties>
