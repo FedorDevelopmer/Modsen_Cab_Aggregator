@@ -17,4 +17,9 @@
         <addUniqueConstraint tableName="passengers" columnNames="passenger_email"/>
         <addUniqueConstraint tableName="passengers" columnNames="passenger_phone"/>
     </changeSet>
+
+    <changeSet id="additional_not_null_constraints_for_rating" author="Fyodor">
+        <addNotNullConstraint tableName="passengers" columnName="passenger_rating"/>
+        <addNotNullConstraint tableName="passengers" columnName="passenger_rating_last_update"/>
+    </changeSet>
 </databaseChangeLog>

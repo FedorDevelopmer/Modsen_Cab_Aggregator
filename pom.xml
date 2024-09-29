@@ -16,8 +16,8 @@
 	<description>Cab aggregator application, developed as Modsen intership project</description>
   <modules>
     <module>src/rating-service</module>
-		<module>src/ride-service</module>
-    <module>src/passenger-service</module
+	<module>src/ride-service</module>
+    <module>src/passenger-service</module>
     <module>src/driver-service</module>
   </modules>
 	<properties>
@@ -29,6 +29,11 @@
 		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
 		<spring-data-jpa.version>3.3.3</spring-data-jpa.version>
 		<liquibase-core.version>4.29.0</liquibase-core.version>
+		<feign.version>13.1</feign.version>
+		<apache-kafka.version>3.8.0</apache-kafka.version>
+		<junit-jupiter-engine.version>5.9.2</junit-jupiter-engine.version>
+		<mockito-core.version>5.3.1</mockito-core.version>
+		<h2.version>2.3.232</h2.version>
 	</properties>
 
 	<dependencies>
@@ -94,6 +99,52 @@
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>${liquibase-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-okhttp</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-slf4j</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-mock</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-jackson</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter-engine.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${h2.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

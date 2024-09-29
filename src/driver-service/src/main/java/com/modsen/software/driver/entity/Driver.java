@@ -3,13 +3,11 @@ package com.modsen.software.driver.entity;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -17,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "drivers")
 public class Driver implements Serializable {
     @Id
@@ -45,9 +44,12 @@ public class Driver implements Serializable {
     @Column(name = "driver_birth_date")
     private Date birthDate;
 
+    @Column(name = "driver_rating_last_update")
+    private LocalDateTime ratingUpdateTimestamp;
+
     @Column(name = "driver_remove_status")
     private RemoveStatus removeStatus;
 
-    @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Car> cars;
 }

@@ -35,4 +35,10 @@
             <column name="driver_rating" type="decimal(2,2)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="addition_of_timestamp_for_async_rating_update" author="Fyodor">
+        <addColumn tableName="drivers">
+            <column name="driver_rating_last_update" type="datetime"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

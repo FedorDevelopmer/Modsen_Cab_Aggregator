@@ -20,11 +20,11 @@ import java.sql.Date;
 public class CarRequestTO {
 
     @NotNull(groups = OnUpdate.class)
-    @Min(value = 1,groups = OnUpdate.class)
+    @Min(value = 1, groups = OnUpdate.class)
     private Long id;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
-    @Min(value = 1,groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 1, groups = {OnUpdate.class, OnCreate.class})
     private Long driverId;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
@@ -34,7 +34,7 @@ public class CarRequestTO {
     private String brand;
 
     @NotBlank(groups = {OnUpdate.class, OnCreate.class})
-    @Pattern(regexp = "^[1-7] *TAX *[0-9]{4}$",groups = {OnUpdate.class, OnCreate.class})
+    @Pattern(regexp = "^[1-7] *TAX *[0-9]{4}$", groups = {OnUpdate.class, OnCreate.class})
     private String registrationNumber;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
@@ -42,7 +42,7 @@ public class CarRequestTO {
     private Date inspectionDate;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
-    @Min(value = 6,groups = {OnUpdate.class, OnCreate.class})
+    @Min(value = 6, groups = {OnUpdate.class, OnCreate.class})
     private Integer inspectionDurationMonth;
 
     @NotNull(groups = {OnUpdate.class, OnCreate.class})

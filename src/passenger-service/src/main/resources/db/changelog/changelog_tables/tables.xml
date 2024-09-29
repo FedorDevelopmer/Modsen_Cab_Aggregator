@@ -15,10 +15,16 @@
         </createTable>
 
     </changeSet>
-    
+
     <changeSet id="addition_of_passenger_rating" author="Fyodor">
         <addColumn tableName="passengers">
             <column name="passenger_rating" type="decimal(2,2)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="addition_of_timestamp_for_async_rating_update" author="Fyodor">
+        <addColumn tableName="passengers">
+            <column name="passenger_rating_last_update" type="datetime"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

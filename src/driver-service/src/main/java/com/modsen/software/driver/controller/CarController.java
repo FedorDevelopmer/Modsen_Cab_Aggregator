@@ -43,10 +43,10 @@ public class CarController {
                                                       @RequestParam(required = false) Date inspectionDateLater,
                                                       @RequestParam(required = false) Integer inspectionDurationMonth,
                                                       @RequestParam(required = false) RemoveStatus removeStatus,
-                                                      @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+                                                      @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         CarFilter filter = new CarFilter(color, brand, registrationNumber, inspectionDateEarlier,
-                                         inspectionDate, inspectionDateLater, inspectionDurationMonth,
-                                         removeStatus);
+                inspectionDate, inspectionDateLater, inspectionDurationMonth,
+                removeStatus);
         Page<CarResponseTO> cars = service.getAllCars(filter, pageable);
         return new ResponseEntity<>(cars, HttpStatus.OK);
     }
@@ -55,7 +55,6 @@ public class CarController {
     public ResponseEntity<CarResponseTO> findById(@PathVariable @Min(1) Long id) {
         CarResponseTO car = service.findCarById(id);
         return new ResponseEntity<>(car, HttpStatus.OK);
-
     }
 
     @PutMapping
@@ -72,7 +71,7 @@ public class CarController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.softDeleteCar(id);
-        return new ResponseEntity<>("Car was successfully delete(softly).",HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("Car was successfully delete(softly).", HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler({CarNotFoundException.class, DriverNotFoundException.class})
@@ -89,8 +88,7 @@ public class CarController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
                         e.getBindingResult().getFieldError()).getField(),
-                        e.getBindingResult().getFieldError().getRejectedValue());
+                e.getBindingResult().getFieldError().getRejectedValue());
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
-
 }

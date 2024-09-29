@@ -1,7 +1,6 @@
 package com.modsen.software.rating.filter;
 
 import com.modsen.software.rating.entity.enumeration.Initiator;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

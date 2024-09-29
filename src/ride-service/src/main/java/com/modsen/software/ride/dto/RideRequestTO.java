@@ -46,5 +46,4 @@ public class RideRequestTO {
     @NotNull(groups = {OnUpdate.class, OnCreate.class})
     @DecimalMin(value = "0.0", inclusive = false, groups = {OnUpdate.class, OnCreate.class})
     private BigDecimal ridePrice;
-
 }

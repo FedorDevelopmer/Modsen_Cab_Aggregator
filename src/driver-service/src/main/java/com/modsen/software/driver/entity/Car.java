@@ -3,10 +3,7 @@ package com.modsen.software.driver.entity;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -15,6 +12,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "cars")
 public class Car implements Serializable {
 
@@ -23,7 +21,7 @@ public class Car implements Serializable {
     @Column(name = "car_id")
     private Long id;
 
-    @Column(name="car_driver")
+    @Column(name = "car_driver")
     private Long driverId;
 
     @Column(name = "car_color")

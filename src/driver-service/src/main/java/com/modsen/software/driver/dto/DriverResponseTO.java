@@ -5,6 +5,7 @@ import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import lombok.*;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -30,8 +31,9 @@ public class DriverResponseTO {
 
     private Date birthDate;
 
+    private LocalDateTime ratingUpdateTimestamp;
+
     private RemoveStatus removeStatus;
 
     private Set<CarResponseTO> cars;
-
 }

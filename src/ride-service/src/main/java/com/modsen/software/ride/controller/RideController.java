@@ -3,6 +3,8 @@ package com.modsen.software.ride.controller;
 import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
+import com.modsen.software.ride.exception.DriverNotFoundException;
+import com.modsen.software.ride.exception.PassengerNotFoundException;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.exception_handler.ExceptionHandling;
 import com.modsen.software.ride.filter.RideFilter;
@@ -44,10 +46,10 @@ public class RideController {
                                                        @RequestParam(required = false) BigDecimal ridePrice,
                                                        @RequestParam(required = false) BigDecimal ridePriceHigher,
                                                        @RequestParam(required = false) BigDecimal ridePriceLower,
-                                                       @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+                                                       @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         RideFilter filter = new RideFilter(driverId, passengerId, departureAddress, destinationAddress,
-                                           rideOrderTime,rideOrderTimeEarlier,rideOrderTimeLater,rideStatus,
-                                           ridePrice,ridePriceLower,ridePriceHigher);
+                rideOrderTime, rideOrderTimeEarlier, rideOrderTimeLater, rideStatus,
+                ridePrice, ridePriceLower, ridePriceHigher);
         Page<RideResponseTO> rides = service.getAllRides(filter, pageable);
         return new ResponseEntity<>(rides, HttpStatus.OK);
     }
@@ -56,7 +58,6 @@ public class RideController {
     public ResponseEntity<RideResponseTO> findById(@PathVariable @Min(1) Long id) {
         RideResponseTO ride = service.findRideById(id);
         return new ResponseEntity<>(ride, HttpStatus.OK);
-
     }
 
     @PutMapping
@@ -80,7 +81,7 @@ public class RideController {
         return new ResponseEntity<>(service.updateRideStatus(id, status), HttpStatus.OK);
     }
 
-    @ExceptionHandler(RideNotFoundException.class)
+    @ExceptionHandler({RideNotFoundException.class, DriverNotFoundException.class, PassengerNotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
         return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
@@ -89,7 +90,7 @@ public class RideController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
                         e.getBindingResult().getFieldError()).getField(),
-                        e.getBindingResult().getFieldError().getRejectedValue());
+                e.getBindingResult().getFieldError().getRejectedValue());
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 }

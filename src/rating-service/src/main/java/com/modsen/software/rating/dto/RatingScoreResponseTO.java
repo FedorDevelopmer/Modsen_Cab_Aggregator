@@ -21,5 +21,4 @@ public class RatingScoreResponseTO {
     private String comment;
 
     private Initiator initiator;
-
 }
