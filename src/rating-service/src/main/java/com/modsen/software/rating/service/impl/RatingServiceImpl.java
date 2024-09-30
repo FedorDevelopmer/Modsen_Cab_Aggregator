@@ -38,12 +38,8 @@ public class RatingServiceImpl implements RatingService {
     @Autowired
     private RatingRepository repository;
 
-    final DriverClient driverClient = Feign
-            .builder()
-            .client(new OkHttpClient())
-            .encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
-            .target(DriverClient.class, DRIVER_SERVICE_URI);
+    @Autowired
+    private DriverClient driverClient;
 
     final PassengerClient passengerClient = Feign
             .builder()

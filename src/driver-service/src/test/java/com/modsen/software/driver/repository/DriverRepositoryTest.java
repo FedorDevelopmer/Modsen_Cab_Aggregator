@@ -1,13 +1,11 @@
 package com.modsen.software.driver.repository;
 
-
 import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.filter.DriverFilter;
 import com.modsen.software.driver.shedule.DriverServiceSchedule;
 import com.modsen.software.driver.specification.DriverSpecification;
-import java.util.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -70,9 +70,8 @@ public class DriverRepositoryTest {
                 .build();
     }
 
-
     @Test
-    void testSaveDriver(){
+    void testSaveDriver() {
         Driver savedDriver = repository.save(driver);
         Assertions.assertNotNull(driver);
         Assertions.assertEquals(1L, savedDriver.getId());
@@ -81,7 +80,7 @@ public class DriverRepositoryTest {
     }
 
     @Test
-    void testUpdateDriver(){
+    void testUpdateDriver() {
         repository.save(driver);
         driver.setName("Keil");
         driver.setPhoneNumber("+321-321-321");
@@ -92,16 +91,16 @@ public class DriverRepositoryTest {
     }
 
     @Test
-    void testSoftDeleteDriver(){
+    void testSoftDeleteDriver() {
         repository.save(driver);
         driver.setRemoveStatus(RemoveStatus.REMOVED);
         Driver removedDriver = repository.save(driver);
-        Assertions.assertNotEquals(Optional.empty(),repository.findById(removedDriver.getId()));
+        Assertions.assertNotEquals(Optional.empty(), repository.findById(removedDriver.getId()));
         Assertions.assertEquals(RemoveStatus.REMOVED, removedDriver.getRemoveStatus());
     }
 
     @Test
-    void testFindById(){
+    void testFindById() {
         repository.save(driver);
         Optional<Driver> foundDriver = repository.findById(driver.getId());
         Assertions.assertNotEquals(Optional.empty(), foundDriver);
@@ -109,7 +108,7 @@ public class DriverRepositoryTest {
     }
 
     @Test
-    void testFindByEmail(){
+    void testFindByEmail() {
         repository.save(driver);
         Optional<Driver> foundDriver = repository.findByEmail(driver.getEmail());
         Assertions.assertNotEquals(Optional.empty(), foundDriver);
@@ -117,15 +116,15 @@ public class DriverRepositoryTest {
     }
 
     @Test
-    void testFindByPhoneNumber(){
+    void testFindByPhoneNumber() {
         repository.save(driver);
         Optional<Driver> foundDriver = repository.findByPhoneNumber(driver.getPhoneNumber());
         Assertions.assertNotEquals(foundDriver, Optional.empty());
-        Assertions.assertEquals( "+123-123-123",foundDriver.get().getPhoneNumber());
+        Assertions.assertEquals("+123-123-123", foundDriver.get().getPhoneNumber());
     }
 
     @Test
-    void testFindAll(){
+    void testFindAll() {
         repository.save(driver);
         repository.save(secondDriver);
         List<Driver> drivers = repository.findAll();

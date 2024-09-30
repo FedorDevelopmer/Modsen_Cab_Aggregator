@@ -9,14 +9,10 @@ import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.repository.RatingRepository;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
 import org.junit.jupiter.api.Assertions;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,6 +26,9 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -86,17 +85,17 @@ public class RatingServiceTest {
         assertNotNull(savedRating);
         assertEquals(rating.getId(), savedRating.getId());
         Assertions.assertEquals(1L, savedRating.getDriverId());
-        Assertions.assertEquals(1L,savedRating.getPassengerId());
+        Assertions.assertEquals(1L, savedRating.getPassengerId());
     }
 
     @Test
     @Timeout(1000)
     void testEvaluateMeanRating() {
-        Pageable pageable = PageRequest.of(0,50);
-        when(ratingRepository.findAll(any(Specification.class),any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Stream.of(rating,secondRating).toList(),
-                pageable,2));
-        RatingEvaluationResponseTO evaluationOfScores = ratingService.evaluateMeanRatingById(1L,Initiator.PASSENGER,pageable);
+        Pageable pageable = PageRequest.of(0, 50);
+        when(ratingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Stream.of(rating, secondRating).toList(),
+                        pageable, 2));
+        RatingEvaluationResponseTO evaluationOfScores = ratingService.evaluateMeanRatingById(1L, Initiator.PASSENGER, pageable);
         assertNotNull(evaluationOfScores);
         assertEquals(1L, evaluationOfScores.getId());
         Assertions.assertEquals(BigDecimal.valueOf(4.98), evaluationOfScores.getMeanEvaluation());
@@ -145,7 +144,7 @@ public class RatingServiceTest {
         assertNotNull(result);
         assertEquals(rating.getId(), result.getId());
         Assertions.assertEquals(1L, rating.getDriverId());
-        Assertions.assertEquals(1L,rating.getPassengerId());
+        Assertions.assertEquals(1L, rating.getPassengerId());
     }
 
     @Test

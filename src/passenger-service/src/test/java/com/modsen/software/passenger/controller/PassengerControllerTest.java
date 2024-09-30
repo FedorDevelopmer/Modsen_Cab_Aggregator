@@ -12,10 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,13 +23,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PassengerController.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -105,12 +103,11 @@ public class PassengerControllerTest {
         secondPassengerResponse.setRating(BigDecimal.valueOf(5));
         secondPassengerResponse.setRatingUpdateTimestamp(LocalDateTime.now());
         secondPassengerResponse.setRemoveStatus(RemoveStatus.ACTIVE);
-
     }
 
     @Test
     @Timeout(1000)
-    void testUpdatePassenger() throws Exception{
+    void testUpdatePassenger() throws Exception {
 
         PassengerRequestTO passengerUpdateRequest = new PassengerRequestTO();
         passengerUpdateRequest.setId(1L);
@@ -138,12 +135,12 @@ public class PassengerControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.name").value("Andrew"))
                 .andExpect(jsonPath("$.email").value("andrew.new@mail.com"));
-        verify(passengerService,times(1)).updatePassenger(passengerUpdateRequest);
+        verify(passengerService, times(1)).updatePassenger(passengerUpdateRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testCreatePassenger() throws Exception{
+    void testCreatePassenger() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         when(passengerService.savePassenger(passengerRequest)).thenReturn(passengerResponse);
         mockMvc.perform(post("/api/v1/passengers")
@@ -153,45 +150,45 @@ public class PassengerControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Andrew"))
                 .andExpect(jsonPath("$.email").value("andrew.tdk@mail.com"));
-        verify(passengerService,times(1)).savePassenger(passengerRequest);
+        verify(passengerService, times(1)).savePassenger(passengerRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testSoftDeletePassenger() throws Exception{
-        mockMvc.perform(delete("/api/v1/passengers/{id}",passengerRequest.getId())
+    void testSoftDeletePassenger() throws Exception {
+        mockMvc.perform(delete("/api/v1/passengers/{id}", passengerRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(204));
 
-        verify(passengerService,times(1)).softDeletePassenger(passengerRequest.getId());
+        verify(passengerService, times(1)).softDeletePassenger(passengerRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testFindPassengerById() throws Exception{
+    void testFindPassengerById() throws Exception {
         when(passengerService.findPassengerById(passengerRequest.getId())).thenReturn(passengerResponse);
-        mockMvc.perform(get("/api/v1/passengers/{id}",passengerRequest.getId())
+        mockMvc.perform(get("/api/v1/passengers/{id}", passengerRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Andrew"))
                 .andExpect(jsonPath("$.email").value("andrew.tdk@mail.com"));
-        verify(passengerService,times(1)).findPassengerById(passengerRequest.getId());
+        verify(passengerService, times(1)).findPassengerById(passengerRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testGetAllPassengers() throws Exception{
-        Pageable pageable = PageRequest.of(0,10, Sort.Direction.ASC,"id");
+    void testGetAllPassengers() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         ArgumentCaptor<PassengerFilter> filterCaptor = forClass(PassengerFilter.class);
         ArgumentCaptor<Pageable> pageableCaptor = forClass(Pageable.class);
-        when(passengerService.getAllPassengers(any(PassengerFilter.class),any(Pageable.class)))
+        when(passengerService.getAllPassengers(any(PassengerFilter.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Stream.of(passengerResponse, secondPassengerResponse).toList(),
-                        pageable,2));
+                        pageable, 2));
         mockMvc.perform(get("/api/v1/passengers")
-                        .param("size","10")
-                        .param("page","0")
-                        .param("sort","id,asc")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("sort", "id,asc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.content[0].id").value(1))
@@ -199,7 +196,7 @@ public class PassengerControllerTest {
                 .andExpect(jsonPath("$.content[1].name").value("Marry"))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.number").value(0));
-        verify(passengerService,times(1)).getAllPassengers(filterCaptor.capture(),
+        verify(passengerService, times(1)).getAllPassengers(filterCaptor.capture(),
                 pageableCaptor.capture());
     }
 }

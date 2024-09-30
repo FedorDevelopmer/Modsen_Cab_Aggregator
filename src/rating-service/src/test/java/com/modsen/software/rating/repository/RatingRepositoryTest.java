@@ -1,6 +1,5 @@
 package com.modsen.software.rating.repository;
 
-
 import com.modsen.software.rating.entity.RatingScore;
 import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.filter.RatingScoreFilter;
@@ -50,9 +49,8 @@ public class RatingRepositoryTest {
                 .build();
     }
 
-
     @Test
-    void testSaveRating(){
+    void testSaveRating() {
         RatingScore savedRating = repository.save(rating);
         Assertions.assertNotNull(rating);
         Assertions.assertEquals(1L, savedRating.getId());
@@ -61,7 +59,7 @@ public class RatingRepositoryTest {
     }
 
     @Test
-    void testUpdateRating(){
+    void testUpdateRating() {
         repository.save(rating);
         rating.setEvaluation(4);
         rating.setDriverId(2L);
@@ -72,7 +70,7 @@ public class RatingRepositoryTest {
     }
 
     @Test
-    void testFindById(){
+    void testFindById() {
         repository.save(rating);
         Optional<RatingScore> foundRating = repository.findById(rating.getId());
         Assertions.assertNotEquals(Optional.empty(), foundRating);
@@ -80,14 +78,14 @@ public class RatingRepositoryTest {
     }
 
     @Test
-    void testFindAll(){
+    void testFindAll() {
         repository.save(rating);
         repository.save(secondRating);
         List<RatingScore> scores = repository.findAll();
         Assertions.assertNotNull(scores);
         Assertions.assertEquals(2, scores.size());
-        Assertions.assertEquals(rating.getId(),scores.get(0).getId());
-        Assertions.assertEquals(secondRating.getId(),scores.get(1).getId());
+        Assertions.assertEquals(rating.getId(), scores.get(0).getId());
+        Assertions.assertEquals(secondRating.getId(), scores.get(1).getId());
     }
 
     @Test
@@ -100,6 +98,6 @@ public class RatingRepositoryTest {
         List<RatingScore> scores = repository.findAll(spec);
         Assertions.assertNotNull(scores);
         Assertions.assertEquals(1, scores.size());
-        Assertions.assertEquals(secondRating.getId(),scores.get(0).getId());
+        Assertions.assertEquals(secondRating.getId(), scores.get(0).getId());
     }
 }

@@ -14,10 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,15 +25,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.stream.Stream;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CarController.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -126,12 +124,11 @@ public class CarControllerTest {
         secondCarResponse.setInspectionDate(new Date(System.currentTimeMillis()));
         secondCarResponse.setInspectionDurationMonth(6);
         secondCarResponse.setRemoveStatus(RemoveStatus.ACTIVE);
-
     }
 
     @Test
     @Timeout(1000)
-    void testUpdateCar() throws Exception{
+    void testUpdateCar() throws Exception {
 
         CarRequestTO carUpdateRequest = new CarRequestTO();
         carUpdateRequest.setId(1L);
@@ -161,12 +158,12 @@ public class CarControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.color").value("YELLOW"))
                 .andExpect(jsonPath("$.registrationNumber").value("6TAX7778"));
-        verify(carService,times(1)).updateCar(carUpdateRequest);
+        verify(carService, times(1)).updateCar(carUpdateRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testCreateCar() throws Exception{
+    void testCreateCar() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         when(carService.saveCar(carRequest)).thenReturn(carResponse);
         mockMvc.perform(post("/api/v1/cars")
@@ -176,45 +173,45 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.brand").value("Ford"))
                 .andExpect(jsonPath("$.registrationNumber").value("6TAX7898"));
-        verify(carService,times(1)).saveCar(carRequest);
+        verify(carService, times(1)).saveCar(carRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testSoftDeleteCar() throws Exception{
-        mockMvc.perform(delete("/api/v1/cars/{id}",carRequest.getId())
+    void testSoftDeleteCar() throws Exception {
+        mockMvc.perform(delete("/api/v1/cars/{id}", carRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(204));
 
-        verify(carService,times(1)).softDeleteCar(carRequest.getId());
+        verify(carService, times(1)).softDeleteCar(carRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testFindCarById() throws Exception{
+    void testFindCarById() throws Exception {
         when(carService.findCarById(carRequest.getId())).thenReturn(carResponse);
-        mockMvc.perform(get("/api/v1/cars/{id}",carRequest.getId())
+        mockMvc.perform(get("/api/v1/cars/{id}", carRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.brand").value("Ford"))
                 .andExpect(jsonPath("$.registrationNumber").value("6TAX7898"));
-        verify(carService,times(1)).findCarById(carRequest.getId());
+        verify(carService, times(1)).findCarById(carRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testGetAllCars() throws Exception{
-        Pageable pageable = PageRequest.of(0,10, Sort.Direction.ASC,"id");
+    void testGetAllCars() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         ArgumentCaptor<CarFilter> filterCaptor = forClass(CarFilter.class);
         ArgumentCaptor<Pageable> pageableCaptor = forClass(Pageable.class);
-        when(carService.getAllCars(any(CarFilter.class),any(Pageable.class)))
+        when(carService.getAllCars(any(CarFilter.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Stream.of(carResponse, secondCarResponse).toList(),
-                        pageable,2));
+                        pageable, 2));
         mockMvc.perform(get("/api/v1/cars")
-                        .param("size","10")
-                        .param("page","0")
-                        .param("sort","id,asc")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("sort", "id,asc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.content[0].id").value(1))
@@ -222,7 +219,7 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.content[1].registrationNumber").value("7TAX4568"))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.number").value(0));
-        verify(carService,times(1)).getAllCars(filterCaptor.capture(),
+        verify(carService, times(1)).getAllCars(filterCaptor.capture(),
                 pageableCaptor.capture());
     }
 }

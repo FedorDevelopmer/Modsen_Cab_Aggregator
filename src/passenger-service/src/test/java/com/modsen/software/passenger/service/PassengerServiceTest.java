@@ -8,14 +8,11 @@ import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
-import org.junit.jupiter.api.Assertions;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,11 +24,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -84,7 +83,7 @@ public class PassengerServiceTest {
         assertNotNull(savedPassenger);
         assertEquals(passenger.getId(), savedPassenger.getId());
         Assertions.assertEquals("+123-123-123", savedPassenger.getPhoneNumber());
-        Assertions.assertEquals("andrew.tdk@mail.com",savedPassenger.getEmail());
+        Assertions.assertEquals("andrew.tdk@mail.com", savedPassenger.getEmail());
     }
 
     @Test
@@ -134,7 +133,7 @@ public class PassengerServiceTest {
         assertNotNull(result);
         assertEquals(passenger.getId(), result.getId());
         Assertions.assertEquals("+123-123-123", passenger.getPhoneNumber());
-        Assertions.assertEquals("andrew.tdk@mail.com",passenger.getEmail());
+        Assertions.assertEquals("andrew.tdk@mail.com", passenger.getEmail());
     }
 
     @Test

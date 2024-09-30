@@ -14,10 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,12 +25,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RatingController.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -104,12 +102,11 @@ public class RatingControllerTest {
         secondRatingResponse.setEvaluation(4);
         secondRatingResponse.setInitiator(Initiator.PASSENGER);
         secondRatingResponse.setComment("Default comment 2");
-
     }
 
     @Test
     @Timeout(1000)
-    void testUpdateRating() throws Exception{
+    void testUpdateRating() throws Exception {
 
         RatingScoreRequestTO ratingUpdateRequest = new RatingScoreRequestTO();
         ratingUpdateRequest.setId(1L);
@@ -135,25 +132,26 @@ public class RatingControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.driverId").value(1))
                 .andExpect(jsonPath("$.passengerId").value(1));
-        verify(ratingService,times(1)).updateRatingScore(ratingUpdateRequest);
+        verify(ratingService, times(1)).updateRatingScore(ratingUpdateRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testRatingEvaluation() throws Exception{
-        when(ratingService.evaluateMeanRatingById(anyLong(),any(Initiator.class),any(Pageable.class)))
-                .thenAnswer(invocationOnMock -> new RatingEvaluationResponseTO(invocationOnMock.getArgument(0),BigDecimal.valueOf(5)));
-        mockMvc.perform(get("/api/v1/scores/evaluation/{id}",1L)
+    void testRatingEvaluation() throws Exception {
+        when(ratingService.evaluateMeanRatingById(anyLong(), any(Initiator.class), any(Pageable.class)))
+                .thenAnswer(invocationOnMock -> new RatingEvaluationResponseTO(invocationOnMock.getArgument(0), BigDecimal.valueOf(5)));
+        mockMvc.perform(get("/api/v1/scores/evaluate/{id}", 1L)
+                        .param("initiator", Initiator.PASSENGER.name())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.evaluation").value(BigDecimal.valueOf(5)));
-        verify(ratingService,times(1)).saveRatingScore(ratingRequest);
+                .andExpect(jsonPath("$.meanEvaluation").value(BigDecimal.valueOf(5)));
+        verify(ratingService, times(1)).evaluateMeanRatingById(eq(1L), any(Initiator.class), any(Pageable.class));
     }
 
     @Test
     @Timeout(1000)
-    void testCreateRating() throws Exception{
+    void testCreateRating() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         when(ratingService.saveRatingScore(ratingRequest)).thenReturn(ratingResponse);
         mockMvc.perform(post("/api/v1/scores")
@@ -163,45 +161,45 @@ public class RatingControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.driverId").value(1))
                 .andExpect(jsonPath("$.passengerId").value(1));
-        verify(ratingService,times(1)).saveRatingScore(ratingRequest);
+        verify(ratingService, times(1)).saveRatingScore(ratingRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testDeleteRating() throws Exception{
-        mockMvc.perform(delete("/api/v1/scores/{id}",ratingRequest.getId())
+    void testDeleteRating() throws Exception {
+        mockMvc.perform(delete("/api/v1/scores/{id}", ratingRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(204));
 
-        verify(ratingService,times(1)).deleteRatingScore(ratingRequest.getId());
+        verify(ratingService, times(1)).deleteRatingScore(ratingRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testFindRatingById() throws Exception{
+    void testFindRatingById() throws Exception {
         when(ratingService.findRatingScoreById(ratingRequest.getId())).thenReturn(ratingResponse);
-        mockMvc.perform(get("/api/v1/scores/{id}",ratingRequest.getId())
+        mockMvc.perform(get("/api/v1/scores/{id}", ratingRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.driverId").value(1))
                 .andExpect(jsonPath("$.passengerId").value(1));
-        verify(ratingService,times(1)).findRatingScoreById(ratingRequest.getId());
+        verify(ratingService, times(1)).findRatingScoreById(ratingRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testGetAllRatings() throws Exception{
-        Pageable pageable = PageRequest.of(0,10, Sort.Direction.ASC,"id");
+    void testGetAllRatings() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         ArgumentCaptor<RatingScoreFilter> filterCaptor = forClass(RatingScoreFilter.class);
         ArgumentCaptor<Pageable> pageableCaptor = forClass(Pageable.class);
-        when(ratingService.getAllRatingScores(any(RatingScoreFilter.class),any(Pageable.class)))
+        when(ratingService.getAllRatingScores(any(RatingScoreFilter.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Stream.of(ratingResponse, secondRatingResponse).toList(),
-                        pageable,2));
+                        pageable, 2));
         mockMvc.perform(get("/api/v1/scores")
-                        .param("size","10")
-                        .param("page","0")
-                        .param("sort","id,asc")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("sort", "id,asc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.content[0].id").value(1))
@@ -209,7 +207,7 @@ public class RatingControllerTest {
                 .andExpect(jsonPath("$.content[1].driverId").value(1))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.number").value(0));
-        verify(ratingService,times(1)).getAllRatingScores(filterCaptor.capture(),
+        verify(ratingService, times(1)).getAllRatingScores(filterCaptor.capture(),
                 pageableCaptor.capture());
     }
 }

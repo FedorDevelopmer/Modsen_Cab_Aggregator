@@ -80,9 +80,8 @@ public class CarRepositoryTest {
                 .build();
     }
 
-
     @Test
-    void testSaveCar(){
+    void testSaveCar() {
         Car savedCar = repository.save(car);
         Assertions.assertNotNull(car);
         Assertions.assertEquals(1L, savedCar.getId());
@@ -91,7 +90,7 @@ public class CarRepositoryTest {
     }
 
     @Test
-    void testUpdateCar(){
+    void testUpdateCar() {
         repository.save(car);
         car.setBrand("Renault");
         car.setRegistrationNumber("6TAX733");
@@ -102,16 +101,16 @@ public class CarRepositoryTest {
     }
 
     @Test
-    void testSoftDeleteCar(){
+    void testSoftDeleteCar() {
         repository.save(car);
         car.setRemoveStatus(RemoveStatus.REMOVED);
         Car removedCar = repository.save(car);
-        Assertions.assertNotEquals( Optional.empty(), repository.findById(removedCar.getId()));
+        Assertions.assertNotEquals(Optional.empty(), repository.findById(removedCar.getId()));
         Assertions.assertEquals(RemoveStatus.REMOVED, removedCar.getRemoveStatus());
     }
 
     @Test
-    void testFindById(){
+    void testFindById() {
         repository.save(car);
         Optional<Car> foundCar = repository.findById(car.getId());
         Assertions.assertNotEquals(Optional.empty(), foundCar);
@@ -119,22 +118,22 @@ public class CarRepositoryTest {
     }
 
     @Test
-    void testFindByRegistrationNumber(){
+    void testFindByRegistrationNumber() {
         repository.save(car);
         Optional<Car> foundCar = repository.findByRegistrationNumber(car.getRegistrationNumber());
-        Assertions.assertNotEquals(Optional.empty(),foundCar);
-        Assertions.assertEquals("6TAX7898",foundCar.get().getRegistrationNumber());
+        Assertions.assertNotEquals(Optional.empty(), foundCar);
+        Assertions.assertEquals("6TAX7898", foundCar.get().getRegistrationNumber());
     }
 
     @Test
-    void testFindAll(){
+    void testFindAll() {
         repository.save(car);
         repository.save(secondCar);
         List<Car> cars = repository.findAll();
         Assertions.assertNotNull(cars);
-        Assertions.assertEquals(2,cars.size());
-        Assertions.assertEquals(car.getId(),cars.get(0).getId());
-        Assertions.assertEquals(secondCar.getId(),cars.get(1).getId());
+        Assertions.assertEquals(2, cars.size());
+        Assertions.assertEquals(car.getId(), cars.get(0).getId());
+        Assertions.assertEquals(secondCar.getId(), cars.get(1).getId());
     }
 
     @Test
@@ -147,6 +146,6 @@ public class CarRepositoryTest {
         List<Car> cars = repository.findAll(spec);
         Assertions.assertNotNull(cars);
         Assertions.assertEquals(2, cars.size());
-        Assertions.assertEquals(car.getId(),cars.get(0).getId());
+        Assertions.assertEquals(car.getId(), cars.get(0).getId());
     }
 }

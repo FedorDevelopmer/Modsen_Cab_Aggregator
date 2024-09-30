@@ -1,6 +1,5 @@
 package com.modsen.software.driver.controller;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.software.driver.dto.DriverRequestTO;
 import com.modsen.software.driver.dto.DriverResponseTO;
@@ -8,22 +7,13 @@ import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.filter.DriverFilter;
-import com.modsen.software.driver.service.DriverService;
 import com.modsen.software.driver.service.impl.DriverServiceImpl;
-import com.modsen.software.driver.shedule.DriverServiceSchedule;
-import org.assertj.core.util.Arrays;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
@@ -31,20 +21,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Stream;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -135,12 +123,11 @@ public class DriverControllerTest {
         secondDriverResponse.setRating(BigDecimal.valueOf(5));
         secondDriverResponse.setRatingUpdateTimestamp(LocalDateTime.now());
         secondDriverResponse.setCars(new HashSet<>());
-
     }
 
     @Test
     @Timeout(1000)
-    void testUpdateDriver() throws Exception{
+    void testUpdateDriver() throws Exception {
 
         DriverRequestTO driverUpdateRequest = new DriverRequestTO();
         driverUpdateRequest.setId(1L);
@@ -169,63 +156,63 @@ public class DriverControllerTest {
         mockMvc.perform(put("/api/v1/drivers")
                         .content(mapper.writeValueAsString(driverUpdateRequest))
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().is(200))
-                        .andExpect(jsonPath("$.surname").value("Doe"))
-                        .andExpect(jsonPath("$.email").value("john.doe@mail.com"));
-        verify(driverService,times(1)).updateDriver(driverUpdateRequest);
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.surname").value("Doe"))
+                .andExpect(jsonPath("$.email").value("john.doe@mail.com"));
+        verify(driverService, times(1)).updateDriver(driverUpdateRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testCreateDriver() throws Exception{
+    void testCreateDriver() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         when(driverService.saveDriver(driverRequest)).thenReturn(driverResponse);
         mockMvc.perform(post("/api/v1/drivers")
                         .content(mapper.writeValueAsString(driverRequest))
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().is(201))
-                        .andExpect(jsonPath("$.id").value(1))
-                        .andExpect(jsonPath("$.name").value("John"))
-                        .andExpect(jsonPath("$.email").value("john.con@mail.com"));
-        verify(driverService,times(1)).saveDriver(driverRequest);
+                .andExpect(status().is(201))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("John"))
+                .andExpect(jsonPath("$.email").value("john.con@mail.com"));
+        verify(driverService, times(1)).saveDriver(driverRequest);
     }
 
     @Test
     @Timeout(1000)
-    void testSoftDeleteDriver() throws Exception{
-        mockMvc.perform(delete("/api/v1/drivers/{id}",driverRequest.getId())
+    void testSoftDeleteDriver() throws Exception {
+        mockMvc.perform(delete("/api/v1/drivers/{id}", driverRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().is(204));
+                .andExpect(status().is(204));
 
-        verify(driverService,times(1)).softDeleteDriver(driverRequest.getId());
+        verify(driverService, times(1)).softDeleteDriver(driverRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testFindDriverById() throws Exception{
+    void testFindDriverById() throws Exception {
         when(driverService.findDriverById(driverRequest.getId())).thenReturn(driverResponse);
-        mockMvc.perform(get("/api/v1/drivers/{id}",driverRequest.getId())
+        mockMvc.perform(get("/api/v1/drivers/{id}", driverRequest.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("John"))
                 .andExpect(jsonPath("$.email").value("john.con@mail.com"));
-        verify(driverService,times(1)).findDriverById(driverRequest.getId());
+        verify(driverService, times(1)).findDriverById(driverRequest.getId());
     }
 
     @Test
     @Timeout(1000)
-    void testGetAllDrivers() throws Exception{
-        Pageable pageable = PageRequest.of(0,10, Sort.Direction.ASC,"id");
+    void testGetAllDrivers() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         ArgumentCaptor<DriverFilter> filterCaptor = forClass(DriverFilter.class);
         ArgumentCaptor<Pageable> pageableCaptor = forClass(Pageable.class);
-        when(driverService.getAllDrivers(any(DriverFilter.class),any(Pageable.class)))
+        when(driverService.getAllDrivers(any(DriverFilter.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Stream.of(driverResponse, secondDriverResponse).toList(),
-                pageable,2));
+                        pageable, 2));
         mockMvc.perform(get("/api/v1/drivers")
-                        .param("size","10")
-                        .param("page","0")
-                        .param("sort","id,asc")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("sort", "id,asc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.content[0].id").value(1))
@@ -233,7 +220,7 @@ public class DriverControllerTest {
                 .andExpect(jsonPath("$.content[1].name").value("Elina"))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.number").value(0));
-        verify(driverService,times(1)).getAllDrivers(filterCaptor.capture(),
-                                                                            pageableCaptor.capture());
+        verify(driverService, times(1)).getAllDrivers(filterCaptor.capture(),
+                pageableCaptor.capture());
     }
 }

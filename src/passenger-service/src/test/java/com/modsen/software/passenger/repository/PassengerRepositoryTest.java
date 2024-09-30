@@ -56,9 +56,8 @@ public class PassengerRepositoryTest {
                 .build();
     }
 
-
     @Test
-    void testSavePassenger(){
+    void testSavePassenger() {
         Passenger savedPassenger = repository.save(passenger);
         Assertions.assertNotNull(passenger);
         Assertions.assertEquals(1L, savedPassenger.getId());
@@ -67,7 +66,7 @@ public class PassengerRepositoryTest {
     }
 
     @Test
-    void testUpdatePassenger(){
+    void testUpdatePassenger() {
         repository.save(passenger);
         passenger.setPhoneNumber("+155-143-190");
         passenger.setEmail("andrew.chg@mail.com");
@@ -78,16 +77,16 @@ public class PassengerRepositoryTest {
     }
 
     @Test
-    void testSoftDeletePassenger(){
+    void testSoftDeletePassenger() {
         repository.save(passenger);
         passenger.setRemoveStatus(RemoveStatus.REMOVED);
         Passenger removedPassenger = repository.save(passenger);
-        Assertions.assertNotEquals( Optional.empty(), repository.findById(removedPassenger.getId()));
+        Assertions.assertNotEquals(Optional.empty(), repository.findById(removedPassenger.getId()));
         Assertions.assertEquals(RemoveStatus.REMOVED, removedPassenger.getRemoveStatus());
     }
 
     @Test
-    void testFindById(){
+    void testFindById() {
         repository.save(passenger);
         Optional<Passenger> foundPassenger = repository.findById(passenger.getId());
         Assertions.assertNotEquals(Optional.empty(), foundPassenger);
@@ -95,14 +94,14 @@ public class PassengerRepositoryTest {
     }
 
     @Test
-    void testFindAll(){
+    void testFindAll() {
         repository.save(passenger);
         repository.save(secondPassenger);
         List<Passenger> passengers = repository.findAll();
         Assertions.assertNotNull(passengers);
         Assertions.assertEquals(2, passengers.size());
-        Assertions.assertEquals(passenger.getId(),passengers.get(0).getId());
-        Assertions.assertEquals(secondPassenger.getId(),passengers.get(1).getId());
+        Assertions.assertEquals(passenger.getId(), passengers.get(0).getId());
+        Assertions.assertEquals(secondPassenger.getId(), passengers.get(1).getId());
     }
 
     @Test
@@ -115,6 +114,6 @@ public class PassengerRepositoryTest {
         List<Passenger> passengers = repository.findAll(spec);
         Assertions.assertNotNull(passengers);
         Assertions.assertEquals(1, passengers.size());
-        Assertions.assertEquals(passenger.getId(),passengers.get(0).getId());
+        Assertions.assertEquals(passenger.getId(), passengers.get(0).getId());
     }
 }

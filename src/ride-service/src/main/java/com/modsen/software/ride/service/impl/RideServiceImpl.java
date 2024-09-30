@@ -31,7 +31,8 @@ public class RideServiceImpl implements RideService {
 
     private final String PASSENGER_SERVICE_URI = "http://localhost:8081/api/v1/passengers";
 
-    private RestClient client = RestClient.create();
+    @Autowired
+    private RestClient client;
 
     @Autowired
     private RideRepository repository;
