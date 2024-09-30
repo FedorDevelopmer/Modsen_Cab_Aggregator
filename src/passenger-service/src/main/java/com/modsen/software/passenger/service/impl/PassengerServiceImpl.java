@@ -58,17 +58,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponseTO updatePassenger(PassengerRequestTO passengerTO) {
         repository.findById(passengerTO.getId()).orElseThrow(PassengerNotFoundException::new);
         checkDuplications(passengerTO);
-        RatingEvaluationResponseTO evaluatedRatingResponse = ratingClient.get()
-                .uri("/evaluate/{id}?initiator=PASSENGER", passengerTO.getId())
-                .retrieve()
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
-                    throw new PassengerNotFoundException();
-                })
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
-                    throw new BadEvaluationRequestException();
-                })
-                .bodyToMono(RatingEvaluationResponseTO.class)
-                .block();
+        RatingEvaluationResponseTO evaluatedRatingResponse = evaluateMeanRating(passengerTO);
         Passenger passengerToUpdate = mapper.requestToPassenger(passengerTO);
         passengerToUpdate.setRating(evaluatedRatingResponse.getMeanEvaluation());
         return mapper.passengerToResponse(repository.save(passengerToUpdate));
@@ -92,6 +82,20 @@ public class PassengerServiceImpl implements PassengerService {
     @Transactional
     public void deletePassenger(Long id) {
         repository.delete(repository.findById(id).orElseThrow(PassengerNotFoundException::new));
+    }
+
+    private RatingEvaluationResponseTO evaluateMeanRating(PassengerRequestTO passengerTO) {
+        return ratingClient.get()
+                .uri("/evaluate/{id}?initiator=PASSENGER", passengerTO.getId())
+                .retrieve()
+                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
+                    throw new PassengerNotFoundException();
+                })
+                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
+                    throw new BadEvaluationRequestException();
+                })
+                .bodyToMono(RatingEvaluationResponseTO.class)
+                .block();
     }
 
     private void checkDuplications(PassengerRequestTO passengerTO) {

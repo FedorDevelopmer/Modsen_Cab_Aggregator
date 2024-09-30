@@ -76,17 +76,7 @@ public class DriverServiceImpl implements DriverService {
         Driver driver = repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
         Set<Car> cars = driver.getCars();
         checkDuplications(driverTO);
-        RatingEvaluationResponseTO evaluatedRatingResponse = ratingClient.get()
-                .uri("/evaluate/{id}?initiator=PASSENGER", driverTO.getId())
-                .retrieve()
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
-                    throw new DriverNotFoundException();
-                })
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
-                    throw new BadEvaluationRequestException();
-                })
-                .bodyToMono(RatingEvaluationResponseTO.class)
-                .block();
+        RatingEvaluationResponseTO evaluatedRatingResponse = evaluateMeanRating(driverTO);
         Driver driverToUpdate = mapper.requestToDriver(driverTO);
         driverToUpdate.setCars(cars);
         driverToUpdate.setRating(evaluatedRatingResponse.getMeanEvaluation());
@@ -129,6 +119,20 @@ public class DriverServiceImpl implements DriverService {
     @Transactional
     public void deleteDriver(Long id) {
         repository.delete(mapper.responseToDriver(findDriverById(id)));
+    }
+
+    private RatingEvaluationResponseTO evaluateMeanRating(DriverRequestTO driverTO) {
+        return ratingClient.get()
+                .uri("/evaluate/{id}?initiator=DRIVER", driverTO.getId())
+                .retrieve()
+                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
+                    throw new DriverNotFoundException();
+                })
+                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
+                    throw new BadEvaluationRequestException();
+                })
+                .bodyToMono(RatingEvaluationResponseTO.class)
+                .block();
     }
 
     private void checkDuplications(DriverRequestTO driverTO) {

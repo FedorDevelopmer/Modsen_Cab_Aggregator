@@ -64,20 +64,8 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public RideResponseTO updateRide(RideRequestTO rideTO) {
         repository.findById(rideTO.getId()).orElseThrow(RideNotFoundException::new);
-        client.get()
-                .uri(DRIVER_SERVICE_URI + "/{id}", rideTO.getDriverId())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    throw new DriverNotFoundException();
-                }))
-                .body(DriverResponseTO.class);
-        client.get()
-                .uri(PASSENGER_SERVICE_URI + "/{id}", rideTO.getDriverId())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    throw new PassengerNotFoundException();
-                }))
-                .body(PassengerResponseTO.class);
+        getRideDriver(rideTO);
+        getRidePassenger(rideTO);
         return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
     }
 
@@ -90,6 +78,17 @@ public class RideServiceImpl implements RideService {
 
     @Transactional
     public RideResponseTO saveRide(RideRequestTO rideTO) {
+        getRideDriver(rideTO);
+        getRidePassenger(rideTO);
+        return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
+    }
+
+    @Transactional
+    public void deleteRide(Long id) {
+        repository.delete(mapper.responseToRide(findRideById(id)));
+    }
+
+    private void getRideDriver(RideRequestTO rideTO){
         client.get()
                 .uri(DRIVER_SERVICE_URI + "/{id}", rideTO.getDriverId())
                 .retrieve()
@@ -97,18 +96,15 @@ public class RideServiceImpl implements RideService {
                     throw new DriverNotFoundException();
                 }))
                 .body(DriverResponseTO.class);
+    }
+
+    private void getRidePassenger(RideRequestTO rideTO){
         client.get()
-                .uri(PASSENGER_SERVICE_URI + "/{id}", rideTO.getDriverId())
+                .uri(PASSENGER_SERVICE_URI + "/{id}", rideTO.getPassengerId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     throw new PassengerNotFoundException();
                 }))
                 .body(PassengerResponseTO.class);
-        return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
-    }
-
-    @Transactional
-    public void deleteRide(Long id) {
-        repository.delete(mapper.responseToRide(findRideById(id)));
     }
 }
