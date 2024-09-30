@@ -8,7 +8,7 @@ import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
