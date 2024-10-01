@@ -35,4 +35,9 @@
         <!-- Cars Table -->
         <addUniqueConstraint tableName="cars" columnNames="car_reg_number"/>
     </changeSet>
+
+    <changeSet id="additional_not_null_constraints_for_rating" author="Fyodor">
+        <addNotNullConstraint tableName="drivers" columnName="driver_rating"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_rating_last_update"/>
+    </changeSet>
 </databaseChangeLog>

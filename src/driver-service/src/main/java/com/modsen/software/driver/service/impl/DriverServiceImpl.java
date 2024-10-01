@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 @Service
 public class DriverServiceImpl implements DriverService {
+
     @Autowired
     private DriverRepository repository;
 
@@ -62,25 +64,47 @@ public class DriverServiceImpl implements DriverService {
                 .and(DriverSpecification.hasBirthDate(filter.getBirthDate()))
                 .and(DriverSpecification.hasBirthDateLater(filter.getBirthDateLater()))
                 .and(DriverSpecification.hasRemoveStatus(filter.getRemoveStatus()));
-        return repository.findAll(spec, pageable).map((item) -> mapper.driverToResponse(item));
+        return repository.findAll(spec, pageable)
+                .map((item) -> {
+                    if (!LocalDateTime.now().isBefore(item.getRatingUpdateTimestamp().plusDays(1))) {
+                        updateDriverRating(item);
+                    }
+                    return item;
+                })
+                .map((item) -> mapper.driverToResponse(item));
     }
 
     @Transactional
     public DriverResponseTO findDriverById(Long id) {
-        Optional<Driver> driver = repository.findById(id);
-        return mapper.driverToResponse(driver.orElseThrow(DriverNotFoundException::new));
+        Driver driver = repository.findById(id).orElseThrow(DriverNotFoundException::new);
+        if (!LocalDateTime.now().isBefore(driver.getRatingUpdateTimestamp().plusDays(1))) {
+            updateDriverRating(driver);
+        }
+        return mapper.driverToResponse(driver);
     }
 
     @Transactional
     public DriverResponseTO updateDriver(DriverRequestTO driverTO) {
-        Driver driver = repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
-        Set<Car> cars = driver.getCars();
         checkDuplications(driverTO);
-        RatingEvaluationResponseTO evaluatedRatingResponse = evaluateMeanRating(driverTO);
+        Driver oldDriver = repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
+        Set<Car> cars = oldDriver.getCars();
         Driver driverToUpdate = mapper.requestToDriver(driverTO);
+        driverToUpdate.setRatingUpdateTimestamp(oldDriver.getRatingUpdateTimestamp());
         driverToUpdate.setCars(cars);
-        driverToUpdate.setRating(evaluatedRatingResponse.getMeanEvaluation());
-        return mapper.driverToResponse(repository.save(driverToUpdate));
+        driverToUpdate.setRating(oldDriver.getRating());
+        if (!LocalDateTime.now().isBefore(oldDriver.getRatingUpdateTimestamp().plusDays(1))) {
+            return mapper.driverToResponse(updateDriverRating(driverToUpdate));
+        } else {
+            return mapper.driverToResponse(repository.save(driverToUpdate));
+        }
+    }
+
+    @Transactional
+    public void updateDriverByKafka(RatingEvaluationResponseTO ratingEvaluation) {
+        Driver driver = repository.findById(ratingEvaluation.getId()).orElseThrow(DriverNotFoundException::new);
+        driver.setRating(ratingEvaluation.getMeanEvaluation());
+        driver.setRatingUpdateTimestamp(LocalDateTime.now());
+        repository.save(driver);
     }
 
     @Transactional
@@ -93,6 +117,7 @@ public class DriverServiceImpl implements DriverService {
             driverTO.getCars().clear();
             Driver driverToSave = mapper.requestToDriver(driverTO);
             driverToSave.setRating(defaultRating);
+            driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
             Driver savedDriver = repository.save(driverToSave);
             for (DriverRelatedCarRequestTO relatedCarRequestTO : requestCars) {
                 Car carToSave = carMapper.driverRelatedRequestToCar(relatedCarRequestTO);
@@ -105,7 +130,9 @@ public class DriverServiceImpl implements DriverService {
             driverTO.setCars(new HashSet<>());
             Driver driverToSave = mapper.requestToDriver(driverTO);
             driverToSave.setRating(defaultRating);
-            return mapper.driverToResponse(repository.save(driverToSave));
+            driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
+            Driver driver = repository.save(driverToSave);
+            return mapper.driverToResponse(driver);
         }
     }
 
@@ -119,6 +146,19 @@ public class DriverServiceImpl implements DriverService {
     @Transactional
     public void deleteDriver(Long id) {
         repository.delete(mapper.responseToDriver(findDriverById(id)));
+    }
+
+    private void checkDuplications(DriverRequestTO driverTO) {
+        repository.findByEmail(driverTO.getEmail()).ifPresent(driver -> {
+            if (!Objects.equals(driver.getId(), driverTO.getId())) {
+                throw new DuplicateEmailException();
+            }
+        });
+        repository.findByPhoneNumber(driverTO.getPhoneNumber()).ifPresent(driver -> {
+            if (!Objects.equals(driver.getId(), driverTO.getId())) {
+                throw new DuplicatePhoneException();
+            }
+        });
     }
 
     private RatingEvaluationResponseTO evaluateMeanRating(DriverRequestTO driverTO) {
@@ -135,16 +175,10 @@ public class DriverServiceImpl implements DriverService {
                 .block();
     }
 
-    private void checkDuplications(DriverRequestTO driverTO) {
-        repository.findByEmail(driverTO.getEmail()).ifPresent(driver -> {
-            if (!Objects.equals(driver.getId(), driverTO.getId())) {
-                throw new DuplicateEmailException();
-            }
-        });
-        repository.findByPhoneNumber(driverTO.getPhoneNumber()).ifPresent(driver -> {
-            if (!Objects.equals(driver.getId(), driverTO.getId())) {
-                throw new DuplicatePhoneException();
-            }
-        });
+    private Driver updateDriverRating(Driver driver) {
+        RatingEvaluationResponseTO evaluatedRating = evaluateMeanRating(mapper.driverToRequest(driver));
+        driver.setRating(evaluatedRating.getMeanEvaluation());
+        driver.setRatingUpdateTimestamp(LocalDateTime.now());
+        return repository.save(driver);
     }
 }

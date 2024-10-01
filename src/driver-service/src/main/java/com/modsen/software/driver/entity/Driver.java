@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -44,6 +45,9 @@ public class Driver implements Serializable {
 
     @Column(name = "driver_birth_date")
     private Date birthDate;
+
+    @Column(name = "driver_rating_last_update")
+    private LocalDateTime ratingUpdateTimestamp;
 
     @Column(name = "driver_remove_status")
     private RemoveStatus removeStatus;

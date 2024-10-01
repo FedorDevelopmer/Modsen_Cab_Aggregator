@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -36,6 +37,9 @@ public class Passenger {
 
     @Column(name = "passenger_gender")
     private Gender gender;
+
+    @Column(name = "passenger_rating_last_update")
+    private LocalDateTime ratingUpdateTimestamp;
 
     @Column(name = "passenger_remove_status")
     private RemoveStatus removeStatus;

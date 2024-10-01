@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -45,30 +47,56 @@ public class PassengerServiceImpl implements PassengerService {
                 .and(PassengerSpecification.hasGender(filter.getGender()))
                 .and(PassengerSpecification.hasPhone(filter.getPhoneNumber()))
                 .and(PassengerSpecification.hasRemoveStatus(filter.getRemoveStatus()));
-        return repository.findAll(spec, pageable).map((item) -> mapper.passengerToResponse(item));
+        return repository.findAll(spec, pageable)
+                .map((item) -> {
+                    if (!LocalDateTime.now().isBefore(item.getRatingUpdateTimestamp().plusDays(1))) {
+                        updatePassengerDriverRating(item);
+                    }
+                    return item;
+                })
+                .map((item) -> mapper.passengerToResponse(item));
     }
 
     @Transactional
     public PassengerResponseTO findPassengerById(Long id) {
-        Optional<Passenger> passenger = repository.findById(id);
-        return mapper.passengerToResponse(passenger.orElseThrow(PassengerNotFoundException::new));
+        Passenger passenger = repository.findById(id).orElseThrow(PassengerNotFoundException::new);
+        if (!LocalDateTime.now().isBefore(passenger.getRatingUpdateTimestamp().plusDays(1))) {
+            updatePassengerDriverRating(passenger);
+        }
+        return mapper.passengerToResponse(passenger);
     }
 
     @Transactional
     public PassengerResponseTO updatePassenger(PassengerRequestTO passengerTO) {
         repository.findById(passengerTO.getId()).orElseThrow(PassengerNotFoundException::new);
         checkDuplications(passengerTO);
-        RatingEvaluationResponseTO evaluatedRatingResponse = evaluateMeanRating(passengerTO);
+        Passenger oldPassenger = repository.findById(passengerTO.getId()).orElseThrow(PassengerNotFoundException::new);
         Passenger passengerToUpdate = mapper.requestToPassenger(passengerTO);
-        passengerToUpdate.setRating(evaluatedRatingResponse.getMeanEvaluation());
-        return mapper.passengerToResponse(repository.save(passengerToUpdate));
+        passengerToUpdate.setRatingUpdateTimestamp(oldPassenger.getRatingUpdateTimestamp());
+        passengerToUpdate.setRating(oldPassenger.getRating());
+        if (!LocalDateTime.now().isBefore(oldPassenger.getRatingUpdateTimestamp().plusDays(1))) {
+            return mapper.passengerToResponse(updatePassengerDriverRating(passengerToUpdate));
+        } else {
+            return mapper.passengerToResponse(repository.save(passengerToUpdate));
+        }
+    }
+
+    @Transactional
+    public void updatePassengerByKafka(RatingEvaluationResponseTO ratingEvaluation) {
+        Passenger passenger = repository.findById(ratingEvaluation.getId()).orElseThrow(PassengerNotFoundException::new);
+        passenger.setRating(ratingEvaluation.getMeanEvaluation());
+        passenger.setRatingUpdateTimestamp(LocalDateTime.now());
+        repository.save(passenger);
     }
 
     @Transactional
     public PassengerResponseTO savePassenger(PassengerRequestTO passengerTO) {
         checkDuplications(passengerTO);
         Passenger passengerToSave = mapper.requestToPassenger(passengerTO);
-        passengerToSave.setRating(BigDecimal.valueOf(5));
+        BigDecimal defaultRating = BigDecimal.valueOf(5);
+        defaultRating = defaultRating.setScale(2, RoundingMode.HALF_UP);
+        passengerToSave.setRating(defaultRating);
+        passengerToSave.setRatingUpdateTimestamp(LocalDateTime.now());
         return mapper.passengerToResponse(repository.save(passengerToSave));
     }
 
@@ -82,6 +110,19 @@ public class PassengerServiceImpl implements PassengerService {
     @Transactional
     public void deletePassenger(Long id) {
         repository.delete(repository.findById(id).orElseThrow(PassengerNotFoundException::new));
+    }
+
+    private void checkDuplications(PassengerRequestTO passengerTO) {
+        repository.getByEmail(passengerTO.getEmail()).ifPresent((passenger -> {
+            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
+                throw new DuplicateEmailException();
+            }
+        }));
+        repository.getByPhoneNumber(passengerTO.getPhoneNumber()).ifPresent((passenger -> {
+            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
+                throw new DuplicatePhoneNumberException();
+            }
+        }));
     }
 
     private RatingEvaluationResponseTO evaluateMeanRating(PassengerRequestTO passengerTO) {
@@ -98,16 +139,10 @@ public class PassengerServiceImpl implements PassengerService {
                 .block();
     }
 
-    private void checkDuplications(PassengerRequestTO passengerTO) {
-        repository.getByEmail(passengerTO.getEmail()).ifPresent((passenger -> {
-            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
-                throw new DuplicateEmailException();
-            }
-        }));
-        repository.getByPhoneNumber(passengerTO.getPhoneNumber()).ifPresent((passenger -> {
-            if (!Objects.equals(passenger.getId(), passengerTO.getId())) {
-                throw new DuplicatePhoneNumberException();
-            }
-        }));
+    private Passenger updatePassengerDriverRating(Passenger passenger) {
+        RatingEvaluationResponseTO evaluatedRating = evaluateMeanRating(mapper.passengerToRequest(passenger));
+        passenger.setRating(evaluatedRating.getMeanEvaluation());
+        passenger.setRatingUpdateTimestamp(LocalDateTime.now());
+        return repository.save(passenger);
     }
 }
