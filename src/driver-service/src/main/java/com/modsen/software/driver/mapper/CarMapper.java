@@ -17,5 +17,4 @@ public interface CarMapper {
     Car requestToCar(CarRequestTO carRequestTo);
 
     Car driverRelatedRequestToCar(DriverRelatedCarRequestTO relatedCarRequestTo);
-
 }

@@ -23,7 +23,7 @@ public class Car implements Serializable {
     @Column(name = "car_id")
     private Long id;
 
-    @Column(name="car_driver")
+    @Column(name = "car_driver")
     private Long driverId;
 
     @Column(name = "car_color")

@@ -33,5 +33,4 @@ public class DriverResponseTO {
     private RemoveStatus removeStatus;
 
     private Set<CarResponseTO> cars;
-
 }

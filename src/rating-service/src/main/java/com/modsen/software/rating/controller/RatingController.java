@@ -1,5 +1,6 @@
 package com.modsen.software.rating.controller;
 
+import com.modsen.software.rating.dto.RatingEvaluationResponseTO;
 import com.modsen.software.rating.dto.RatingScoreRequestTO;
 import com.modsen.software.rating.dto.RatingScoreResponseTO;
 import com.modsen.software.rating.entity.enumeration.Initiator;
@@ -9,6 +10,7 @@ import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
 import com.modsen.software.rating.validation.OnCreate;
 import com.modsen.software.rating.validation.OnUpdate;
+import feign.FeignException;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,17 +39,24 @@ public class RatingController {
                                                               @RequestParam(required = false) Integer evaluationLower,
                                                               @RequestParam(required = false) Integer evaluationHigher,
                                                               @RequestParam(required = false) Initiator initiator,
-                                                              @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+                                                              @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         RatingScoreFilter filter = new RatingScoreFilter(driverId, passengerId, evaluation, evaluationHigher, evaluationLower, initiator);
         Page<RatingScoreResponseTO> ratings = service.getAllRatingScores(filter, pageable);
         return new ResponseEntity<>(ratings, HttpStatus.OK);
+    }
+
+    @GetMapping("/evaluate/{id}")
+    public ResponseEntity<RatingEvaluationResponseTO> evaluateMeanRatingById(@PathVariable @Min(1) Long id,
+                                                                             @RequestParam Initiator initiator,
+                                                                             @PageableDefault(page = 0, size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        RatingEvaluationResponseTO rating = service.evaluateMeanRatingById(id, initiator, pageable);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<RatingScoreResponseTO> findById(@PathVariable @Min(1) Long id) {
         RatingScoreResponseTO rating = service.findRatingScoreById(id);
         return new ResponseEntity<>(rating, HttpStatus.OK);
-
     }
 
     @PutMapping
@@ -66,7 +75,7 @@ public class RatingController {
         return new ResponseEntity<>("Rating score successfully deleted", HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler(RatingScoreNotFoundException.class)
+    @ExceptionHandler({RatingScoreNotFoundException.class, FeignException.class})
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
         return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
@@ -74,9 +83,8 @@ public class RatingController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
-                e.getBindingResult().getFieldError()).getField(),
+                        e.getBindingResult().getFieldError()).getField(),
                 e.getBindingResult().getFieldError().getRejectedValue());
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
-
 }

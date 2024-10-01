@@ -44,10 +44,10 @@ public class DriverController {
                                                          @RequestParam(required = false) Date birthDate,
                                                          @RequestParam(required = false) Date birthDateLater,
                                                          @RequestParam(required = false) RemoveStatus removeStatus,
-                                                         @PageableDefault(sort = "id",direction = Sort.Direction.ASC) Pageable pageable) {
+                                                         @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         DriverFilter filter = new DriverFilter(name, surname, email, phoneNumber, gender, birthDateEarlier,
-                                                     birthDate, birthDateLater, removeStatus);
-        Page<DriverResponseTO> drivers =  service.getAllDrivers(filter,pageable);
+                birthDate, birthDateLater, removeStatus);
+        Page<DriverResponseTO> drivers = service.getAllDrivers(filter, pageable);
         return new ResponseEntity<>(drivers, HttpStatus.OK);
     }
 
@@ -55,7 +55,6 @@ public class DriverController {
     public ResponseEntity<DriverResponseTO> findById(@PathVariable @Min(1) Long id) {
         DriverResponseTO driver = service.findDriverById(id);
         return new ResponseEntity<>(driver, HttpStatus.OK);
-
     }
 
     @PutMapping
@@ -71,7 +70,7 @@ public class DriverController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.softDeleteDriver(id);
-        return new ResponseEntity<>("Driver was successfully deleted(softly).",HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("Driver was successfully deleted(softly).", HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(DriverNotFoundException.class)
@@ -88,7 +87,7 @@ public class DriverController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
                         e.getBindingResult().getFieldError()).getField(),
-                        e.getBindingResult().getFieldError().getRejectedValue());
+                e.getBindingResult().getFieldError().getRejectedValue());
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 }

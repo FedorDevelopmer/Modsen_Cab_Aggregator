@@ -1,6 +1,5 @@
 package com.modsen.software.passenger.repository;
 
-
 import com.modsen.software.passenger.entity.Passenger;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

@@ -17,5 +17,4 @@ public interface PassengerService {
     PassengerResponseTO updatePassenger(PassengerRequestTO carRequest);
 
     void deletePassenger(Long id);
-
 }

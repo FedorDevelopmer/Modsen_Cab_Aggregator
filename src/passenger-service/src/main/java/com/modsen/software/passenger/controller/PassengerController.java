@@ -4,6 +4,7 @@ import com.modsen.software.passenger.dto.PassengerRequestTO;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
 import com.modsen.software.passenger.entity.enumeration.Gender;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
+import com.modsen.software.passenger.exception.BadEvaluationRequestException;
 import com.modsen.software.passenger.exception.DuplicateEmailException;
 import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
 import com.modsen.software.passenger.exception.PassengerNotFoundException;
@@ -40,7 +41,7 @@ public class PassengerController {
                                                             @RequestParam(required = false) Gender gender,
                                                             @RequestParam(required = false) RemoveStatus removeStatus,
                                                             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        PassengerFilter filter = new PassengerFilter(name,email,phoneNumber,gender,removeStatus);
+        PassengerFilter filter = new PassengerFilter(name, email, phoneNumber, gender, removeStatus);
         Page<PassengerResponseTO> passengers = service.getAllPassengers(filter, pageable);
         return new ResponseEntity<>(passengers, HttpStatus.OK);
     }
@@ -49,7 +50,6 @@ public class PassengerController {
     public ResponseEntity<PassengerResponseTO> findById(@PathVariable @Min(1) Long id) {
         PassengerResponseTO passenger = service.findPassengerById(id);
         return new ResponseEntity<>(passenger, HttpStatus.OK);
-
     }
 
     @PutMapping
@@ -73,7 +73,7 @@ public class PassengerController {
         return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
-    @ExceptionHandler({DuplicateEmailException.class, DuplicatePhoneNumberException.class})
+    @ExceptionHandler({DuplicateEmailException.class, DuplicatePhoneNumberException.class, BadEvaluationRequestException.class})
     public ResponseEntity<Object> handleDuplicationException(RuntimeException e, WebRequest request) {
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
@@ -82,7 +82,7 @@ public class PassengerController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
                         e.getBindingResult().getFieldError()).getField(),
-                        e.getBindingResult().getFieldError().getRejectedValue());
+                e.getBindingResult().getFieldError().getRejectedValue());
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 }

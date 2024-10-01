@@ -17,5 +17,4 @@ public interface DriverService {
     DriverResponseTO updateDriver(DriverRequestTO carRequest);
 
     void deleteDriver(Long id);
-
 }

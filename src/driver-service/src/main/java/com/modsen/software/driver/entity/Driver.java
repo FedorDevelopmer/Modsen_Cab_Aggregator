@@ -48,6 +48,6 @@ public class Driver implements Serializable {
     @Column(name = "driver_remove_status")
     private RemoveStatus removeStatus;
 
-    @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Car> cars;
 }

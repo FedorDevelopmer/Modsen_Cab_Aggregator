@@ -23,7 +23,7 @@ public class DriverRelatedCarRequestTO {
     private String brand;
 
     @NotBlank(groups = OnCreate.class)
-    @Pattern(regexp = "^[1-7] *TAX *[0-9]{4}$",groups = OnCreate.class)
+    @Pattern(regexp = "^[1-7] *TAX *[0-9]{4}$", groups = OnCreate.class)
     private String registrationNumber;
 
     @NotNull(groups = OnCreate.class)
@@ -31,7 +31,7 @@ public class DriverRelatedCarRequestTO {
     private Date inspectionDate;
 
     @NotNull(groups = OnCreate.class)
-    @Min(value = 6,groups = OnCreate.class)
+    @Min(value = 6, groups = OnCreate.class)
     private Integer inspectionDurationMonth;
 
     @NotNull(groups = OnCreate.class)

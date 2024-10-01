@@ -15,7 +15,7 @@
         </createTable>
 
     </changeSet>
-    
+
     <changeSet id="addition_of_passenger_rating" author="Fyodor">
         <addColumn tableName="passengers">
             <column name="passenger_rating" type="decimal(2,2)"/>
