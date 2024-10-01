@@ -20,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -70,6 +72,14 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Transactional
+    public void updateDriverByKafka(RatingEvaluationResponseTO ratingEvaluation) {
+        Driver driver = repository.findById(ratingEvaluation.getId()).orElseThrow(DriverNotFoundException::new);
+        driver.setRating(ratingEvaluation.getMeanEvaluation());
+        driver.setRatingUpdateTimestamp(LocalDateTime.now());
+        repository.save(driver);
+    }
+
+    @Transactional
     public DriverResponseTO saveDriver(DriverRequestTO driverTO) {
         checkDuplications(driverTO);
         if(Objects.nonNull(driverTO.getCars())) {
@@ -87,7 +97,6 @@ public class DriverServiceImpl implements DriverService {
             driverTO.setCars(new HashSet<>());
             return mapper.driverToResponse(repository.save(mapper.requestToDriver(driverTO)));
         }
-
     }
 
     @Transactional
