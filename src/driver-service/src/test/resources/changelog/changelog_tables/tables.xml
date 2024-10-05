@@ -25,10 +25,10 @@
             <column name="driver_phone" type="varchar">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="driver_remove_status" type="varchar">
+            <column name="driver_rating" type="decimal(2,2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="driver_rating" type="decimal(2,2)">
+            <column name="driver_remove_status" type="varchar">
                 <constraints nullable="false"/>
             </column>
             <column name="driver_rating_last_update" type="datetime">

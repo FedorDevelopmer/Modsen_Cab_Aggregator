@@ -2,24 +2,30 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    <changeSet id="basic_tables_setup" author="Fyodor">
-        <createTable tableName="rating_scores">
-            <column name="rating_score_id" autoIncrement="true" type="bigint">
+    <changeSet id="basic_table_setup" author="Fyodor">
+        <createTable tableName="rides">
+            <column name="ride_id" autoIncrement="true" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="rating_score_driver_id" type="bigint">
+            <column name="ride_driver_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="rating_score_passenger_id" type="bigint">
+            <column name="ride_passenger_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="rating_score_evaluation" type="int">
+            <column name="ride_departure_address" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="rating_score_comment" type="varchar">
+            <column name="ride_destination_address" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="rating_score_initiator" type="varchar">
+            <column name="ride_order_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ride_status" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ride_price" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

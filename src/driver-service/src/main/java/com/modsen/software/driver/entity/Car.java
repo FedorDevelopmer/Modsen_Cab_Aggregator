@@ -1,5 +1,6 @@
 package com.modsen.software.driver.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
@@ -44,5 +45,6 @@ public class Car implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
+    @JsonBackReference
     private Driver driver;
 }
