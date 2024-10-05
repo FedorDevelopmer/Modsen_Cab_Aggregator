@@ -2,16 +2,14 @@ package com.modsen.software.rating.entity;
 
 import com.modsen.software.rating.entity.enumeration.Initiator;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "rating_scores")
 public class RatingScore {
     @Id

@@ -1,12 +1,10 @@
 package com.modsen.software.driver.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -15,6 +13,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "cars")
 public class Car implements Serializable {
 
@@ -46,5 +45,6 @@ public class Car implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
+    @JsonBackReference
     private Driver driver;
 }

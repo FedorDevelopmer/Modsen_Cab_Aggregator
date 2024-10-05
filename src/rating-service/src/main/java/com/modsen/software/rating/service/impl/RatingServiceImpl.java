@@ -76,9 +76,11 @@ public class RatingServiceImpl implements RatingService {
     public RatingEvaluationResponseTO evaluateMeanRatingById(Long id, Initiator initiator, Pageable pageable) {
         Specification<RatingScore> spec;
         if (initiator.equals(Initiator.DRIVER)) {
-            spec = Specification.where(RatingScoreSpecification.hasDriverId(id));
+            spec = Specification.where(RatingScoreSpecification.hasDriverId(id)
+                    .and(Specification.where(RatingScoreSpecification.hasInitiator(Initiator.PASSENGER))));
         } else {
-            spec = Specification.where(RatingScoreSpecification.hasPassengerId(id));
+            spec = Specification.where(RatingScoreSpecification.hasPassengerId(id)
+                    .and(Specification.where(RatingScoreSpecification.hasInitiator(Initiator.DRIVER))));
         }
         List<RatingScore> scores = repository.findAll(spec, pageable).getContent();
         BigDecimal meanEvaluation = new BigDecimal("0.0");
