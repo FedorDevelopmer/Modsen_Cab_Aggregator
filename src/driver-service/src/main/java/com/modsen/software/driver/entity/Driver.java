@@ -1,12 +1,10 @@
 package com.modsen.software.driver.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -18,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "drivers")
 public class Driver implements Serializable {
     @Id
@@ -53,5 +52,6 @@ public class Driver implements Serializable {
     private RemoveStatus removeStatus;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Car> cars;
 }

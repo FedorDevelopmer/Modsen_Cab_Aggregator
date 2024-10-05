@@ -59,7 +59,7 @@ public class DriverController {
 
     @PutMapping
     public ResponseEntity<DriverResponseTO> update(@Validated(OnUpdate.class) @RequestBody DriverRequestTO driverTO) {
-        return new ResponseEntity<>(service.updateDriver(driverTO), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(service.updateDriver(driverTO), HttpStatus.OK);
     }
 
     @PostMapping
