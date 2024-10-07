@@ -1,13 +1,9 @@
 package com.modsen.software.driver.service.impl;
 
-import com.modsen.software.driver.dto.DriverRelatedCarRequestTO;
-import com.modsen.software.driver.dto.DriverRequestTO;
-import com.modsen.software.driver.dto.DriverResponseTO;
-import com.modsen.software.driver.dto.RatingEvaluationResponseTO;
+import com.modsen.software.driver.dto.*;
 import com.modsen.software.driver.entity.Car;
 import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import com.modsen.software.driver.exception.BadEvaluationRequestException;
 import com.modsen.software.driver.exception.DriverNotFoundException;
 import com.modsen.software.driver.exception.DuplicateEmailException;
 import com.modsen.software.driver.exception.DuplicatePhoneException;
@@ -23,16 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DriverServiceImpl implements DriverService {
@@ -64,61 +52,30 @@ public class DriverServiceImpl implements DriverService {
                 .and(DriverSpecification.hasBirthDate(filter.getBirthDate()))
                 .and(DriverSpecification.hasBirthDateLater(filter.getBirthDateLater()))
                 .and(DriverSpecification.hasRemoveStatus(filter.getRemoveStatus()));
-        return repository.findAll(spec, pageable)
-                .map((item) -> {
-                    if (!LocalDateTime.now().isBefore(item.getRatingUpdateTimestamp().plusDays(1))) {
-                        updateDriverRating(item);
-                    }
-                    return item;
-                })
-                .map((item) -> mapper.driverToResponse(item));
+        return repository.findAll(spec, pageable).map((item)-> mapper.driverToResponse(item));
+
     }
 
     @Transactional
     public DriverResponseTO findDriverById(Long id) {
-        Driver driver = repository.findById(id).orElseThrow(DriverNotFoundException::new);
-        if (!LocalDateTime.now().isBefore(driver.getRatingUpdateTimestamp().plusDays(1))) {
-            updateDriverRating(driver);
-        }
-        return mapper.driverToResponse(driver);
+        Optional<Driver> driver = repository.findById(id);
+        return mapper.driverToResponse(driver.orElseThrow(DriverNotFoundException::new));
     }
 
     @Transactional
     public DriverResponseTO updateDriver(DriverRequestTO driverTO) {
+        repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
         checkDuplications(driverTO);
-        Driver oldDriver = repository.findById(driverTO.getId()).orElseThrow(DriverNotFoundException::new);
-        Set<Car> cars = oldDriver.getCars();
-        Driver driverToUpdate = mapper.requestToDriver(driverTO);
-        driverToUpdate.setRatingUpdateTimestamp(oldDriver.getRatingUpdateTimestamp());
-        driverToUpdate.setCars(cars);
-        driverToUpdate.setRating(oldDriver.getRating());
-        if (!LocalDateTime.now().isBefore(oldDriver.getRatingUpdateTimestamp().plusDays(1))) {
-            return mapper.driverToResponse(updateDriverRating(driverToUpdate));
-        } else {
-            return mapper.driverToResponse(repository.save(driverToUpdate));
-        }
-    }
-
-    @Transactional
-    public void updateDriverByKafka(RatingEvaluationResponseTO ratingEvaluation) {
-        Driver driver = repository.findById(ratingEvaluation.getId()).orElseThrow(DriverNotFoundException::new);
-        driver.setRating(ratingEvaluation.getMeanEvaluation());
-        driver.setRatingUpdateTimestamp(LocalDateTime.now());
-        repository.save(driver);
+        return mapper.driverToResponse(repository.save(mapper.requestToDriver(driverTO)));
     }
 
     @Transactional
     public DriverResponseTO saveDriver(DriverRequestTO driverTO) {
         checkDuplications(driverTO);
-        BigDecimal defaultRating = new BigDecimal(5);
-        defaultRating = defaultRating.setScale(2, RoundingMode.HALF_UP);
-        if (Objects.nonNull(driverTO.getCars())) {
+        if(Objects.nonNull(driverTO.getCars())) {
             Set<DriverRelatedCarRequestTO> requestCars = Set.copyOf(driverTO.getCars());
             driverTO.getCars().clear();
-            Driver driverToSave = mapper.requestToDriver(driverTO);
-            driverToSave.setRating(defaultRating);
-            driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
-            Driver savedDriver = repository.save(driverToSave);
+            Driver savedDriver = repository.save(mapper.requestToDriver(driverTO));
             for (DriverRelatedCarRequestTO relatedCarRequestTO : requestCars) {
                 Car carToSave = carMapper.driverRelatedRequestToCar(relatedCarRequestTO);
                 carToSave.setDriverId(savedDriver.getId());
@@ -128,12 +85,9 @@ public class DriverServiceImpl implements DriverService {
             return mapper.driverToResponse(savedDriver);
         } else {
             driverTO.setCars(new HashSet<>());
-            Driver driverToSave = mapper.requestToDriver(driverTO);
-            driverToSave.setRating(defaultRating);
-            driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
-            Driver driver = repository.save(driverToSave);
-            return mapper.driverToResponse(driver);
+            return mapper.driverToResponse(repository.save(mapper.requestToDriver(driverTO)));
         }
+
     }
 
     @Transactional
@@ -150,35 +104,14 @@ public class DriverServiceImpl implements DriverService {
 
     private void checkDuplications(DriverRequestTO driverTO) {
         repository.findByEmail(driverTO.getEmail()).ifPresent(driver -> {
-            if (!Objects.equals(driver.getId(), driverTO.getId())) {
+            if(!Objects.equals(driver.getId(),driverTO.getId())) {
                 throw new DuplicateEmailException();
             }
         });
         repository.findByPhoneNumber(driverTO.getPhoneNumber()).ifPresent(driver -> {
-            if (!Objects.equals(driver.getId(), driverTO.getId())) {
+            if(!Objects.equals(driver.getId(),driverTO.getId())) {
                 throw new DuplicatePhoneException();
             }
         });
-    }
-
-    private RatingEvaluationResponseTO evaluateMeanRating(DriverRequestTO driverTO) {
-        return ratingClient.get()
-                .uri("/evaluate/{id}?initiator=DRIVER", driverTO.getId())
-                .retrieve()
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
-                    throw new DriverNotFoundException();
-                })
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
-                    throw new BadEvaluationRequestException();
-                })
-                .bodyToMono(RatingEvaluationResponseTO.class)
-                .block();
-    }
-
-    private Driver updateDriverRating(Driver driver) {
-        RatingEvaluationResponseTO evaluatedRating = evaluateMeanRating(mapper.driverToRequest(driver));
-        driver.setRating(evaluatedRating.getMeanEvaluation());
-        driver.setRatingUpdateTimestamp(LocalDateTime.now());
-        return repository.save(driver);
     }
 }

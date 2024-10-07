@@ -16,7 +16,5 @@ public interface CarService {
 
     CarResponseTO updateCar(CarRequestTO carRequest);
 
-
-
     void deleteCar(Long id);
 }
