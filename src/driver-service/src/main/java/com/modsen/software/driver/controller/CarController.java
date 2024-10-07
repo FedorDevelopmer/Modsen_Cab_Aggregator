@@ -21,12 +21,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import java.sql.Date;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/api/v1/cars")
@@ -86,9 +86,14 @@ public class CarController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
-        String message = String.format("Parameter '%s' is invalid. Validation failed for value: '%s'", Objects.requireNonNull(
-                        e.getBindingResult().getFieldError()).getField(),
-                e.getBindingResult().getFieldError().getRejectedValue());
-        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, message, request);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Validation failed for provided parameters: ");
+        for(FieldError error : e.getBindingResult().getFieldErrors()){
+            sb.append("Invalid value ").append("'")
+              .append(error.getRejectedValue()).append("'")
+              .append(" for provided field ").append("'")
+              .append(error.getField()).append("'. \n ");
+        }
+        return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
     }
 }
