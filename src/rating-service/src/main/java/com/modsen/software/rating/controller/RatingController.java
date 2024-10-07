@@ -4,13 +4,14 @@ import com.modsen.software.rating.dto.RatingEvaluationResponseTO;
 import com.modsen.software.rating.dto.RatingScoreRequestTO;
 import com.modsen.software.rating.dto.RatingScoreResponseTO;
 import com.modsen.software.rating.entity.enumeration.Initiator;
+import com.modsen.software.rating.exception.DriverNotFoundException;
+import com.modsen.software.rating.exception.PassengerNotFoundException;
 import com.modsen.software.rating.exception.RatingScoreNotFoundException;
 import com.modsen.software.rating.exception_handler.ExceptionHandling;
 import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
 import com.modsen.software.rating.validation.OnCreate;
 import com.modsen.software.rating.validation.OnUpdate;
-import feign.FeignException;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -75,7 +76,7 @@ public class RatingController {
         return new ResponseEntity<>("Rating score successfully deleted", HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler({RatingScoreNotFoundException.class, FeignException.class})
+    @ExceptionHandler({RatingScoreNotFoundException.class, DriverNotFoundException.class, PassengerNotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException(RuntimeException e, WebRequest request) {
         return ExceptionHandling.formExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }

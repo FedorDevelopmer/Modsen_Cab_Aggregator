@@ -9,7 +9,6 @@ import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 

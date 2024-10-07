@@ -2,10 +2,7 @@ package com.modsen.software.ride.entity;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "rides")
 public class Ride {
     @Id

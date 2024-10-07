@@ -19,5 +19,7 @@ public interface DriverService {
 
     void updateDriverByKafka(RatingEvaluationResponseTO ratingEvaluationResponseTO);
 
+    void softDeleteDriver(Long id);
+
     void deleteDriver(Long id);
 }
