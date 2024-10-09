@@ -18,6 +18,8 @@ import java.util.Set;
 @Builder
 @Table(name = "drivers")
 public class Driver implements Serializable {
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "driver_id")
     private Long id;
@@ -25,7 +27,6 @@ public class Driver implements Serializable {
     @Column(name = "driver_name")
     private String name;
 
-    @Id
     @Column(name = "driver_surname")
     private String surname;
 
