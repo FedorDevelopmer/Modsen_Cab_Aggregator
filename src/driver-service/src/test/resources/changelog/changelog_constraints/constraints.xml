@@ -1,0 +1,43 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="basic_tables_setup" author="Fyodor">
+        <!-- Drivers Table -->
+        <addNotNullConstraint tableName="drivers" columnName="driver_name"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_surname"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_email"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_gender"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_birth_date"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_phone"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_remove_status"/>
+        <!-- Cars Table -->
+        <addNotNullConstraint tableName="cars" columnName="car_driver"/>
+        <addNotNullConstraint tableName="cars" columnName="car_color"/>
+        <addNotNullConstraint tableName="cars" columnName="car_brand"/>
+        <addNotNullConstraint tableName="cars" columnName="car_reg_number"/>
+        <addNotNullConstraint tableName="cars" columnName="car_inspection_date"/>
+        <addNotNullConstraint tableName="cars" columnName="car_inspection_duration_month"/>
+        <addNotNullConstraint tableName="cars" columnName="car_remove_status"/>
+
+        <addForeignKeyConstraint baseTableName="cars"
+                                 baseColumnNames="car_driver"
+                                 constraintName="FK_drivers_cars"
+                                 referencedTableName="drivers"
+                                 referencedColumnNames="driver_id"/>
+
+    </changeSet>
+
+    <changeSet id="create_unique_constraints" author="Fyodor">
+        <!-- Drivers Table -->
+        <addUniqueConstraint tableName="drivers" columnNames="driver_email"/>
+        <addUniqueConstraint tableName="drivers" columnNames="driver_phone"/>
+        <!-- Cars Table -->
+        <addUniqueConstraint tableName="cars" columnNames="car_reg_number"/>
+    </changeSet>
+
+    <changeSet id="additional_not_null_constraints_for_rating" author="Fyodor">
+        <addNotNullConstraint tableName="drivers" columnName="driver_rating"/>
+        <addNotNullConstraint tableName="drivers" columnName="driver_rating_last_update"/>
+    </changeSet>
+</databaseChangeLog>
