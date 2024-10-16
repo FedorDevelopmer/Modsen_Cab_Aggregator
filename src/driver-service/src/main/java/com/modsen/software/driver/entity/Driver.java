@@ -1,5 +1,6 @@
 package com.modsen.software.driver.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
@@ -18,6 +19,8 @@ import java.util.Set;
 @Builder
 @Table(name = "drivers")
 public class Driver implements Serializable {
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "driver_id")
     private Long id;
@@ -25,7 +28,6 @@ public class Driver implements Serializable {
     @Column(name = "driver_name")
     private String name;
 
-    @Id
     @Column(name = "driver_surname")
     private String surname;
 
@@ -51,5 +53,6 @@ public class Driver implements Serializable {
     private RemoveStatus removeStatus;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Car> cars;
 }

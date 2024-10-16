@@ -1,0 +1,66 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="basic_tables_setup" author="Fyodor">
+        <createTable tableName="drivers">
+            <column name="driver_id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="driver_name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_surname" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_gender" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_email" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="driver_birth_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_phone" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="driver_rating" type="decimal(2,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_remove_status" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_rating_last_update" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="cars">
+            <column autoIncrement="true" name="car_id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="car_driver" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_color" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_brand" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_reg_number" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="car_inspection_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_inspection_duration_month" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_remove_status" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
