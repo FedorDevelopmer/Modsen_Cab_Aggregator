@@ -14,25 +14,12 @@
     <packaging>pom</packaging>
     <name>Cab Aggregator Project</name>
 	<description>Cab aggregator application, developed as Modsen intership project</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-    <modules>
-        <module>src/driver-service</module>
-		<module>src/passenger-service</module>
-		<module>src/ride-service</module>
-		<module>src/rating-service</module>
-    </modules>
-    <scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+  <modules>
+    <module>src/rating-service</module>
+	<module>src/ride-service</module>
+    <module>src/passenger-service</module>
+    <module>src/driver-service</module>
+  </modules>
 	<properties>
 		<java.version>17</java.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
@@ -48,10 +35,11 @@
 		<mockito-core.version>5.3.1</mockito-core.version>
 		<h2.version>2.3.232</h2.version>
 		<spring-cloud-starter-openfeign.version>4.1.3</spring-cloud-starter-openfeign.version>
-        <junit-vintage-engine.version>5.7.0</junit-vintage-engine.version>
-        <jackson-databind.version>2.17.0</jackson-databind.version>
+		<jackson-databind.version>2.17.0</jackson-databind.version>
+		<junit-vintage-engine.version>5.7.0</junit-vintage-engine.version>
+		<wiremock-standalone.version>2.31.0</wiremock-standalone.version>
 		<spring-cloud-starter-openfeign.version>4.1.3</spring-cloud-starter-openfeign.version>
-        <io.cucumber.version>7.20.0</io.cucumber.version>
+		<io.cucumber.version>7.20.0</io.cucumber.version>
 		<test-containers.version>1.19.8</test-containers.version>
 		<wiremock-standalone.version>2.31.0</wiremock-standalone.version>
 	</properties>
@@ -126,11 +114,6 @@
 			<version>${feign.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
-			<version>${spring-cloud-starter-openfeign.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>io.github.openfeign</groupId>
 			<artifactId>feign-slf4j</artifactId>
 			<version>${feign.version}</version>
@@ -149,24 +132,6 @@
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit-jupiter-engine.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>${mockito-core.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>${h2.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 			<version>${spring-cloud-starter-openfeign.version}</version>
@@ -182,17 +147,43 @@
 			<version>${jackson-databind.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit-vintage-engine.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-jre8-standalone</artifactId>
+			<version>${wiremock-standalone.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.220</version>
+		</dependency>
+		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
 			<version>${io.cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit-vintage-engine.version}</version>
-            <scope>test</scope>
-        </dependency>
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-junit</artifactId>
