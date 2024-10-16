@@ -16,9 +16,7 @@
             <column name="rating_score_evaluation" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="rating_score_comment" type="varchar">
-                <constraints nullable="false"/>
-            </column>
+            <column name="rating_score_comment" type="varchar"/>
             <column name="rating_score_initiator" type="varchar">
                 <constraints nullable="false"/>
             </column>
