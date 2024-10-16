@@ -19,6 +19,7 @@ import java.util.Set;
 @Builder
 @Table(name = "drivers")
 public class Driver implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "driver_id")

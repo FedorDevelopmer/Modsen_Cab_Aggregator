@@ -143,7 +143,6 @@ public class CarIntegrationTest {
     }
 
     @BeforeEach
-    @Transactional
     void setUp() throws Exception{
         driverRepository.deleteAll();
         carRepository.deleteAll();
@@ -153,7 +152,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllCarScores() throws Exception {
         saveCar(car);
         saveCar(secondCar);
@@ -174,7 +172,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllCarScoresWithFilter() throws Exception {
         saveCar(car);
         saveCar(secondCar);
@@ -191,7 +188,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testSaveCarScore() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -205,7 +201,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateCarScore() throws Exception {
         saveCar(car);
         Car carToUpdate = Car.builder()
@@ -232,7 +227,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteCarScore() throws Exception {
         saveCar(car);
         mockMvc.perform(delete( URI + "/{id}", 1L))
@@ -240,7 +234,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindCarScoreById() throws Exception {
         saveCar(car);
         mockMvc.perform(get(URI + "/{id}", 1L)

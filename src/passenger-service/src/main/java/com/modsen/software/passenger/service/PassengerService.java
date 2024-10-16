@@ -20,4 +20,5 @@ public interface PassengerService {
     void updatePassengerByKafka(RatingEvaluationResponseTO ratingEvaluation);
 
     void deletePassenger(Long id);
+
 }

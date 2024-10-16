@@ -158,7 +158,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllDrivers() throws Exception {
         saveDriver(driver);
         saveDriver(secondDriver);
@@ -180,7 +179,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllDriversWithFilter() throws Exception {
         saveDriver(driver);
         saveDriver(secondDriver);
@@ -198,7 +196,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testSaveDriver() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -214,7 +211,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateDriver() throws Exception {
         saveDriver(driver);
         Driver driverToUpdate = Driver.builder()
@@ -242,7 +238,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteDriver() throws Exception {
         saveDriver(driver);
         mockMvc.perform(delete(URI + "/{id}", 1L))
@@ -250,7 +245,6 @@ public class DriverIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindDriverById() throws Exception {
         saveDriver(driver);
         mockMvc.perform(get(URI + "/{id}", 1L)

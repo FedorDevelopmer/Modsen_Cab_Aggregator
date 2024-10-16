@@ -131,7 +131,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRides() throws Exception {
         saveRide(ride);
         saveRide(secondRide);
@@ -149,7 +148,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRidesWithFilter() throws Exception {
         saveRide(ride);
         saveRide(secondRide);
@@ -165,7 +163,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testSaveRide() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -180,7 +177,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateRide() throws Exception {
         saveRide(ride);
         Ride rideToUpdate = ride;
@@ -196,7 +192,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteRide() throws Exception {
         saveRide(ride);
         mockMvc.perform(delete(URI + "/{id}", 1L))
@@ -204,7 +199,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindRideById() throws Exception {
         saveRide(secondRide);
         mockMvc.perform(get(URI + "/{id}", 1L)
