@@ -1,5 +1,6 @@
 package com.modsen.software.driver.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
@@ -52,5 +53,6 @@ public class Driver implements Serializable {
     private RemoveStatus removeStatus;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Car> cars;
 }
