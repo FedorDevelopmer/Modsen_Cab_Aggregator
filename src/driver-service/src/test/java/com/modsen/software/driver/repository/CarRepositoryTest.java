@@ -93,7 +93,7 @@ public class CarRepositoryTest {
     void testUpdateCar() {
         repository.save(car);
         car.setBrand("Renault");
-        car.setRegistrationNumber("6TAX733");
+        car.setRegistrationNumber("6TAX7338");
         Car updatedCar = repository.save(car);
         Assertions.assertNotNull(updatedCar);
         Assertions.assertEquals("Renault", updatedCar.getBrand());
