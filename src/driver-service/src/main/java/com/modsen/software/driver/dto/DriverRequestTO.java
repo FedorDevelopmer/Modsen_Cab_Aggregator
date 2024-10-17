@@ -6,9 +6,9 @@ import com.modsen.software.driver.validation.OnCreate;
 import com.modsen.software.driver.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.*;
 import java.sql.Date;
 import java.util.Set;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

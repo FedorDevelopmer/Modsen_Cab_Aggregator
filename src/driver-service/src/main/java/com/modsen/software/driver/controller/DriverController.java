@@ -13,6 +13,7 @@ import com.modsen.software.driver.service.impl.DriverServiceImpl;
 import com.modsen.software.driver.validation.OnCreate;
 import com.modsen.software.driver.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
+import java.sql.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import java.sql.Date;
 
 @Controller
 @RequestMapping("/api/v1/drivers")
@@ -87,11 +87,11 @@ public class DriverController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         StringBuilder sb = new StringBuilder();
         sb.append("Validation failed for provided parameters: ");
-        for(FieldError error : e.getBindingResult().getFieldErrors()){
+        for (FieldError error : e.getBindingResult().getFieldErrors()) {
             sb.append("Invalid value ").append("'")
-              .append(error.getRejectedValue()).append("'")
-              .append(" for provided field ").append("'")
-              .append(error.getField()).append("'. \n ");
+                    .append(error.getRejectedValue()).append("'")
+                    .append(" for provided field ").append("'")
+                    .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
     }

@@ -2,11 +2,11 @@ package com.modsen.software.driver.filter;
 
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
+import java.sql.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.sql.Date;
 
 @Getter
 @Setter

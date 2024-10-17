@@ -8,6 +8,9 @@ import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.repository.RatingRepository;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
