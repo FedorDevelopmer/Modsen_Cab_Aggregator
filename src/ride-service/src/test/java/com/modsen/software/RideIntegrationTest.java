@@ -142,10 +142,10 @@ public class RideIntegrationTest {
                 .andExpect(jsonPath("$.totalElements", is(2)))
                 .andExpect(jsonPath("$.content[0].destinationAddress", is("Minsk,Gintovta,30")))
                 .andExpect(jsonPath("$.content[0].rideStatus", is("CREATED")))
-                .andExpect(jsonPath("$.content[0].ridePrice", is(ride.getRidePrice().intValue())))
+                .andExpect(jsonPath("$.content[0].ridePrice", is(ride.getRidePrice().doubleValue())))
                 .andExpect(jsonPath("$.content[1].destinationAddress", is("Minsk,Dombrouskaya,30")))
                 .andExpect(jsonPath("$.content[1].rideStatus", is("ACCEPTED")))
-                .andExpect(jsonPath("$.content[1].ridePrice", is(BigDecimal.valueOf(25).intValue())));
+                .andExpect(jsonPath("$.content[1].ridePrice", is(BigDecimal.valueOf(25).doubleValue())));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class RideIntegrationTest {
                 .andExpect(jsonPath("$.totalElements", is(1)))
                 .andExpect(jsonPath("$.content[0].destinationAddress", is("Minsk,Dombrouskaya,30")))
                 .andExpect(jsonPath("$.content[0].rideStatus", is("ACCEPTED")))
-                .andExpect(jsonPath("$.content[0].ridePrice", is(BigDecimal.valueOf(25).intValue())));
+                .andExpect(jsonPath("$.content[0].ridePrice", is(BigDecimal.valueOf(25).doubleValue())));
     }
 
     @Test

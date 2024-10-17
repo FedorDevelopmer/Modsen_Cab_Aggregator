@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class RatingServiceTest {
+public class RatingServiceUnitTest {
 
     @MockBean
     private RatingRepository ratingRepository;

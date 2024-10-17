@@ -145,10 +145,10 @@ public class CarIntegrationTest {
     @BeforeEach
     @Transactional
     void setUp() throws Exception{
-        driverRepository.deleteAll();
-        carRepository.deleteAll();
         jdbcTemplate.execute("TRUNCATE TABLE " + CARS_TABLE_NAME + " RESTART IDENTITY");
         jdbcTemplate.execute("TRUNCATE TABLE " + DRIVERS_TABLE_NAME + " RESTART IDENTITY CASCADE");
+        driverRepository.deleteAll();
+        carRepository.deleteAll();
         saveDriver(driver);
     }
 

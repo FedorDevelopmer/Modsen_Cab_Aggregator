@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PassengerController.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class PassengerControllerTest {
+public class PassengerControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 

@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class CarServiceTest {
+public class CarServiceUnitTest {
 
     @MockBean
     private CarRepository carRepository;

@@ -153,8 +153,8 @@ public class DriverIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        driverRepository.deleteAll();
         jdbcTemplate.execute("TRUNCATE TABLE " + TABLE_NAME + " RESTART IDENTITY CASCADE");
+        driverRepository.deleteAll();
     }
 
     @Test

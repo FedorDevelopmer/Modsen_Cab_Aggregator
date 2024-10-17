@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-public class RideServiceTest {
+public class RideServiceUnitTest {
 
     @MockBean
     private RideRepository rideRepository;

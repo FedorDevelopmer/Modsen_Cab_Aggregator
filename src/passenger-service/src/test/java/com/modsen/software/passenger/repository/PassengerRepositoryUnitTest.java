@@ -23,7 +23,7 @@ import java.util.Optional;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class PassengerRepositoryTest {
+public class PassengerRepositoryUnitTest {
 
     @Autowired
     private PassengerRepository repository;

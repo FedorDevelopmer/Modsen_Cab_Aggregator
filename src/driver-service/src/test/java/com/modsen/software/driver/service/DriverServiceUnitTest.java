@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class DriverServiceTest {
+public class DriverServiceUnitTest {
 
     @MockBean
     private DriverRepository driverRepository;

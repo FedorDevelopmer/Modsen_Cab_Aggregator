@@ -25,7 +25,7 @@ import java.util.Optional;
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class DriverRepositoryTest {
+public class DriverRepositoryUnitTest {
 
     @Autowired
     private DriverRepository repository;
