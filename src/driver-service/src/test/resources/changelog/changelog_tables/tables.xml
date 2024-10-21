@@ -62,13 +62,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-
-        <addForeignKeyConstraint baseTableName="cars"
-                                 baseColumnNames="car_driver"
-                                 constraintName="FK_drivers_cars"
-                                 referencedTableName="drivers"
-                                 referencedColumnNames="driver_id"/>
-
     </changeSet>
-
 </databaseChangeLog>

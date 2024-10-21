@@ -131,7 +131,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRides() throws Exception {
         saveRide(ride);
         saveRide(secondRide);
@@ -149,7 +148,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRidesWithFilter() throws Exception {
         saveRide(ride);
         saveRide(secondRide);
@@ -160,12 +158,11 @@ public class RideIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", is(1)))
                 .andExpect(jsonPath("$.content[0].destinationAddress", is("Minsk,Dombrouskaya,30")))
-                .andExpect(jsonPath("$.content[0].rideStatus", is("ACCEPTED")))
+                .andExpect(jsonPath("$.content[0].rideStatus", is("ACCEPTED"))));
                 .andExpect(jsonPath("$.content[0].ridePrice", is(BigDecimal.valueOf(25).doubleValue())));
     }
 
     @Test
-    @Transactional
     void testSaveRide() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -180,7 +177,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateRide() throws Exception {
         saveRide(ride);
         Ride rideToUpdate = ride;
@@ -196,7 +192,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteRide() throws Exception {
         saveRide(ride);
         mockMvc.perform(delete(URI + "/{id}", 1L))
@@ -204,7 +199,6 @@ public class RideIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindRideById() throws Exception {
         saveRide(secondRide);
         mockMvc.perform(get(URI + "/{id}", 1L)

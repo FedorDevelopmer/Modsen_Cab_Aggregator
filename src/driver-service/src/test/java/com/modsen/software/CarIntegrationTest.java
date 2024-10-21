@@ -143,17 +143,15 @@ public class CarIntegrationTest {
     }
 
     @BeforeEach
-    @Transactional
     void setUp() throws Exception{
-        jdbcTemplate.execute("TRUNCATE TABLE " + CARS_TABLE_NAME + " RESTART IDENTITY");
-        jdbcTemplate.execute("TRUNCATE TABLE " + DRIVERS_TABLE_NAME + " RESTART IDENTITY CASCADE");
         driverRepository.deleteAll();
         carRepository.deleteAll();
+        jdbcTemplate.execute("TRUNCATE TABLE " + CARS_TABLE_NAME + " RESTART IDENTITY");
+        jdbcTemplate.execute("TRUNCATE TABLE " + DRIVERS_TABLE_NAME + " RESTART IDENTITY CASCADE");
         saveDriver(driver);
     }
 
     @Test
-    @Transactional
     void testGetAllCarScores() throws Exception {
         saveCar(car);
         saveCar(secondCar);
@@ -174,7 +172,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllCarScoresWithFilter() throws Exception {
         saveCar(car);
         saveCar(secondCar);
@@ -191,7 +188,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testSaveCarScore() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -205,7 +201,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateCarScore() throws Exception {
         saveCar(car);
         Car carToUpdate = Car.builder()
@@ -232,7 +227,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteCarScore() throws Exception {
         saveCar(car);
         mockMvc.perform(delete( URI + "/{id}", 1L))
@@ -240,7 +234,6 @@ public class CarIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindCarScoreById() throws Exception {
         saveCar(car);
         mockMvc.perform(get(URI + "/{id}", 1L)

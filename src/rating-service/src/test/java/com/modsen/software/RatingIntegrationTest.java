@@ -128,7 +128,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRatingScores() throws Exception {
         saveRating(ratingScore);
         saveRating(secondRatingScore);
@@ -148,7 +147,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testGetAllRatingScoresWithFilter() throws Exception {
         saveRating(ratingScore);
         saveRating(secondRatingScore);
@@ -165,7 +163,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testSaveRatingScore() throws Exception {
         mockMvc.perform(post(URI)
                         .contentType("application/json")
@@ -180,7 +177,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testUpdateRatingScore() throws Exception {
         saveRating(ratingScore);
         RatingScore ratingToUpdate = RatingScore.builder()
@@ -204,7 +200,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testDeleteRatingScore() throws Exception {
         saveRating(ratingScore);
         mockMvc.perform(delete(URI + "/{id}", 1L))
@@ -212,7 +207,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @Transactional
     void testFindRatingScoreById() throws Exception {
         saveRating(ratingScore);
         mockMvc.perform(get(URI + "/{id}", 1L)
