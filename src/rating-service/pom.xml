@@ -9,8 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
-    <groupId>com.modsen.software</groupId>
     <artifactId>rating-service</artifactId>
 
     <properties>
@@ -18,20 +16,5 @@
         <maven.compiler.target>20</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
-                <version>${spring-cloud-contract.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <baseClassForTests>
-                        com.modsen.software.rating.contract_producer.BaseTestClass
-                    </baseClassForTests>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
