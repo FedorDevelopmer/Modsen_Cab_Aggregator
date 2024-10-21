@@ -3,8 +3,8 @@ package com.modsen.software.driver.specification;
 import com.modsen.software.driver.entity.Car;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import org.springframework.data.jpa.domain.Specification;
 import java.sql.Date;
+import org.springframework.data.jpa.domain.Specification;
 
 public class CarSpecification {
 

@@ -8,6 +8,10 @@ import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,19 +27,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class PassengerServiceUnitTest {
+public class PassengerServiceTest {
 
     @MockBean
     private PassengerRepository passengerRepository;
@@ -76,7 +76,7 @@ public class PassengerServiceUnitTest {
     @Timeout(1000)
     void testSavePassenger() {
         PassengerRequestTO passengerRequest = new PassengerRequestTO(1L, "Andrew",
-                "andrew.tdk@mail.com", "+123-123-123",
+                "+123-123-123", "andrew.tdk@mail.com",
                 Gender.MALE, RemoveStatus.ACTIVE);
         when(passengerRepository.save(any(Passenger.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         PassengerResponseTO savedPassenger = passengerService.savePassenger(passengerRequest);
@@ -90,10 +90,10 @@ public class PassengerServiceUnitTest {
     @Timeout(1000)
     void testUpdatePassenger() {
         PassengerRequestTO passengerRequest = new PassengerRequestTO(1L, "Andrew",
-                "andrew.tdk@mail.com","+123-123-123",
+                "andrew.tdk@mail.com", "+123-123-123",
                 Gender.MALE, RemoveStatus.ACTIVE);
         PassengerRequestTO passengerUpdateRequest = new PassengerRequestTO(1L, "Andrew",
-                "andrew.tdk@mail.com","+145-121-153",
+                "andrew.tdk@mail.com", "+145-121-153",
                 Gender.MALE, RemoveStatus.ACTIVE);
         when(passengerRepository.save(any(Passenger.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(passengerRepository.findById(passenger.getId())).thenReturn(Optional.of(passenger));
@@ -108,7 +108,7 @@ public class PassengerServiceUnitTest {
     @Timeout(1000)
     void testSoftDeletePassenger() {
         PassengerRequestTO passengerRequest = new PassengerRequestTO(1L, "Andrew",
-                "andrew.tdk@mail.com","+123-123-123",
+                "andrew.tdk@mail.com", "+123-123-123",
                 Gender.MALE, RemoveStatus.ACTIVE);
         when(passengerRepository.save(any(Passenger.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(passengerRepository.findById(passenger.getId())).thenReturn(Optional.of(passenger));
@@ -124,7 +124,7 @@ public class PassengerServiceUnitTest {
     @Timeout(1000)
     void testFindPassengerById() {
         PassengerRequestTO passengerRequest = new PassengerRequestTO(1L, "Andrew",
-                "andrew.tdk@mail.com","+123-123-123",
+                "andrew.tdk@mail.com", "+123-123-123",
                 Gender.MALE, RemoveStatus.ACTIVE);
         when(passengerRepository.save(any(Passenger.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(passengerRepository.findById(passenger.getId())).thenReturn(Optional.of(passenger));

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.*;
 import java.io.Serializable;
 import java.sql.Date;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor

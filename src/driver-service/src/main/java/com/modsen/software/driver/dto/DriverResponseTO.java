@@ -2,11 +2,11 @@ package com.modsen.software.driver.dto;
 
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Set;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

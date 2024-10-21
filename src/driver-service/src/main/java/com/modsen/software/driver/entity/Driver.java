@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import jakarta.persistence.*;
-import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Set;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor

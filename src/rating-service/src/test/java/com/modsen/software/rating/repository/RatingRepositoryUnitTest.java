@@ -4,6 +4,8 @@ import com.modsen.software.rating.entity.RatingScore;
 import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.specification.RatingScoreSpecification;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import java.util.List;
-import java.util.Optional;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)

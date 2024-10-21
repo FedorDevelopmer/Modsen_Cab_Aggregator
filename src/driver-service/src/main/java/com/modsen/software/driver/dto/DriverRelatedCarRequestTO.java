@@ -6,8 +6,8 @@ import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.validation.OnCreate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.*;
 import java.sql.Date;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
