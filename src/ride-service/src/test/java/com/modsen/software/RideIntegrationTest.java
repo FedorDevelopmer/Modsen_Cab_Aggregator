@@ -9,7 +9,9 @@ import com.modsen.software.ride.dto.PassengerResponseTO;
 import com.modsen.software.ride.entity.Ride;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.repository.RideRepository;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +27,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 @Testcontainers
 @AutoConfigureMockMvc
@@ -158,7 +157,7 @@ public class RideIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", is(1)))
                 .andExpect(jsonPath("$.content[0].destinationAddress", is("Minsk,Dombrouskaya,30")))
-                .andExpect(jsonPath("$.content[0].rideStatus", is("ACCEPTED"))));
+                .andExpect(jsonPath("$.content[0].rideStatus", is("ACCEPTED")))
                 .andExpect(jsonPath("$.content[0].ridePrice", is(BigDecimal.valueOf(25).doubleValue())));
     }
 

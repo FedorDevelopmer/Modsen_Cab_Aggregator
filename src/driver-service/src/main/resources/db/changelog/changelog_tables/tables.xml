@@ -9,11 +9,11 @@
             </column>
             <column name="driver_name" type="varchar"/>
             <column name="driver_surname" type="varchar"/>
-            <column name="driver_gender" type="varchar"/>
+            <column name="driver_gender" type="smallint"/>
             <column name="driver_email" type="varchar"/>
             <column name="driver_birth_date" type="datetime"/>
             <column name="driver_phone" type="varchar"/>
-            <column name="driver_remove_status" type="varchar"/>
+            <column name="driver_remove_status" type="smallint"/>
         </createTable>
 
         <createTable tableName="cars">
@@ -21,12 +21,13 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="car_driver" type="int"/>
-            <column name="car_color" type="varchar"/>
+            <column name="car_color" type="smallint"/>
             <column name="car_brand" type="varchar"/>
             <column name="car_reg_number" type="varchar"/>
             <column name="car_inspection_date" type="datetime"/>
             <column name="car_inspection_duration_month" type="int"/>
-            <column name="car_remove_status" type="varchar"/>
+            <column name="car_remove_status" type="smallint"/>
+            <column name="driver_id" type="bigint"/>
         </createTable>
     </changeSet>
 

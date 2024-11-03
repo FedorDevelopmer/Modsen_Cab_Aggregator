@@ -2,8 +2,8 @@ package com.modsen.software.ride.dto;
 
 import com.modsen.software.ride.entity.enumeration.Gender;
 import com.modsen.software.ride.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.math.BigDecimal;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

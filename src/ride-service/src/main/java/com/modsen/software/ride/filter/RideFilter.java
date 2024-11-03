@@ -1,12 +1,12 @@
 package com.modsen.software.ride.filter;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

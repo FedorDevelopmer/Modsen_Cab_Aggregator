@@ -82,11 +82,11 @@ public class PassengerController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         StringBuilder sb = new StringBuilder();
         sb.append("Validation failed for provided parameters: ");
-        for(FieldError error : e.getBindingResult().getFieldErrors()){
+        for (FieldError error : e.getBindingResult().getFieldErrors()) {
             sb.append("Invalid value ").append("'")
-              .append(error.getRejectedValue()).append("'")
-              .append(" for provided field ").append("'")
-              .append(error.getField()).append("'. \n ");
+                    .append(error.getRejectedValue()).append("'")
+                    .append(" for provided field ").append("'")
+                    .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
     }

@@ -1,5 +1,10 @@
 package com.modsen.software.ride.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.modsen.software.ride.dto.DriverResponseTO;
+import com.modsen.software.ride.dto.PassengerResponseTO;
 import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.Ride;
@@ -11,10 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,9 +31,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -50,12 +53,16 @@ public class RideServiceUnitTest {
     @Autowired
     private RideServiceImpl rideService;
 
+    private static WireMockServer driverServiceMock = new WireMockServer(options().port(8080));
+
+    private static WireMockServer passengerServiceMock = new WireMockServer(options().port(8081));
+
     private Ride ride;
 
     private Ride secondRide;
 
     @BeforeEach
-    void setUpRide() {
+    void setUpRide() throws Exception {
         ride = Ride.builder()
                 .id(1L)
                 .driverId(1L)
@@ -77,6 +84,22 @@ public class RideServiceUnitTest {
                 .rideOrderTime(LocalDateTime.now().plusHours(5))
                 .rideStatus(RideStatus.ACCEPTED)
                 .build();
+
+        ObjectMapper wireMockMapper = new ObjectMapper();
+        driverServiceMock.stubFor(WireMock.get(WireMock.anyUrl()).willReturn(WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody(wireMockMapper.writeValueAsString(new DriverResponseTO()))));
+        passengerServiceMock.stubFor(WireMock.get(WireMock.anyUrl()).willReturn(WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody(wireMockMapper.writeValueAsString(new PassengerResponseTO()))));
+        driverServiceMock.start();
+        passengerServiceMock.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        driverServiceMock.stop();
+        passengerServiceMock.stop();
     }
 
     @Test
@@ -88,7 +111,6 @@ public class RideServiceUnitTest {
                 "Minsk, Starovoytova,9", RideStatus.CREATED,
                 LocalDateTime.now(), BigDecimal.valueOf(30));
         when(rideRepository.save(any(Ride.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        mockRestClient();
         RideResponseTO savedRide = rideService.saveRide(rideRequest);
         assertNotNull(savedRide);
         assertEquals(ride.getId(), savedRide.getId());
@@ -118,7 +140,6 @@ public class RideServiceUnitTest {
                 1L, "Minsk, Blagodzenskaya,11a",
                 "Minsk, Starovoytova,9", RideStatus.ACCEPTED,
                 LocalDateTime.now(), BigDecimal.valueOf(20));
-        mockRestClient();
         when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
         when(rideRepository.save(any(Ride.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         rideService.saveRide(rideRequest);
@@ -136,7 +157,6 @@ public class RideServiceUnitTest {
                 1L, "Minsk, Blagodzenskaya,11a",
                 "Minsk, Starovoytova,9", RideStatus.CREATED,
                 LocalDateTime.now(), BigDecimal.valueOf(30));
-        mockRestClient();
         when(rideRepository.save(any(Ride.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
         RideResponseTO savedRide = rideService.saveRide(rideRequest);
@@ -150,7 +170,6 @@ public class RideServiceUnitTest {
                 1L, "Minsk, Blagodzenskaya,11a",
                 "Minsk, Starovoytova,9", RideStatus.CREATED,
                 LocalDateTime.now(), BigDecimal.valueOf(30));
-        mockRestClient();
         when(rideRepository.save(any(Ride.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
         rideService.saveRide(rideRequest);
@@ -174,14 +193,5 @@ public class RideServiceUnitTest {
         assertEquals(secondRide.getId(), ridesList.getContent().get(1).getId());
         assertTrue(ridesList.isFirst());
         assertEquals(10, ridesList.getSize());
-    }
-
-    private void mockRestClient() {
-        RestClient.RequestHeadersUriSpec requestHeaders = mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-        when(restClient.get()).thenReturn(requestHeaders);
-        when(requestHeaders.uri(anyString(), anyLong())).thenReturn(requestHeaders);
-        when(requestHeaders.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
     }
 }

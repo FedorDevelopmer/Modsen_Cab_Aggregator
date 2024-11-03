@@ -59,7 +59,7 @@ public class CarTestLoader {
         registry.add("spring.datasource.password", container::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create");
         registry.add("spring.liquibase.enabled", () -> "true");
-        registry.add("spring.liquibase.change-log", () -> "classpath:db/changelog/changelog_root.xml");
+        registry.add("spring.liquibase.change-log", () -> "classpath:db/changelog/test/test_changelog_root.xml");
     }
 
     @BeforeAll

@@ -8,8 +8,6 @@ import com.modsen.software.rating.RatingServiceApplication;
 import com.modsen.software.rating.dto.DriverResponseTO;
 import com.modsen.software.rating.dto.PassengerResponseTO;
 import io.cucumber.spring.CucumberContextConfiguration;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;

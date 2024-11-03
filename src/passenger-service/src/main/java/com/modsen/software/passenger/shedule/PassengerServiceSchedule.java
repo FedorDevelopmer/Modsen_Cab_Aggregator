@@ -25,7 +25,7 @@ public class PassengerServiceSchedule {
     @Autowired
     private ObjectMapper mapper;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(initialDelay = 30000, fixedRate = 60000)
     public void performPassengerRatingUpdate() throws JsonProcessingException {
         PassengerFilter filter = new PassengerFilter();
         int pageIndex = 0;

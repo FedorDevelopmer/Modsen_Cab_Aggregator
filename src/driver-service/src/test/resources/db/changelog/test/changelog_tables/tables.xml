@@ -13,7 +13,7 @@
             <column name="driver_surname" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="driver_gender" type="varchar">
+            <column name="driver_gender" type="smallint">
                 <constraints nullable="false"/>
             </column>
             <column name="driver_email" type="varchar">
@@ -25,10 +25,10 @@
             <column name="driver_phone" type="varchar">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="driver_rating" type="decimal(2,2)">
+            <column name="driver_rating" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="driver_remove_status" type="varchar">
+            <column name="driver_remove_status" type="smallint">
                 <constraints nullable="false"/>
             </column>
             <column name="driver_rating_last_update" type="datetime">
@@ -43,7 +43,7 @@
             <column name="car_driver" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="car_color" type="varchar">
+            <column name="car_color" type="smallint">
                 <constraints nullable="false"/>
             </column>
             <column name="car_brand" type="varchar">
@@ -58,9 +58,10 @@
             <column name="car_inspection_duration_month" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="car_remove_status" type="varchar">
+            <column name="car_remove_status" type="smallint">
                 <constraints nullable="false"/>
             </column>
+            <column name="driver_id" type="bigint"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

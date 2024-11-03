@@ -25,25 +25,25 @@ public class RatingKafkaConsumer {
     private ObjectMapper mapper;
 
     @KafkaListener(topics = "driver-rating", groupId = "rating-evaluation")
-    public void listenDriver(String message){
+    public void listenDriver(String message) {
         try {
             DriverResponseTO driver = mapper.readValue(message, DriverResponseTO.class);
-            RatingEvaluationResponseTO ratingEvaluation = service.evaluateMeanRatingById(driver.getId(), Initiator.DRIVER, PageRequest.of(0,50));
+            RatingEvaluationResponseTO ratingEvaluation = service.evaluateMeanRatingById(driver.getId(), Initiator.DRIVER, PageRequest.of(0, 50));
             String jsonRatingObject = mapper.writeValueAsString(ratingEvaluation);
             producer.sendMessageDriver(jsonRatingObject);
-        } catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
         }
     }
 
     @KafkaListener(topics = "passenger-rating", groupId = "rating-evaluation")
-    public void listenPassenger(String message){
+    public void listenPassenger(String message) {
         try {
             PassengerResponseTO passenger = mapper.readValue(message, PassengerResponseTO.class);
-            RatingEvaluationResponseTO ratingEvaluation = service.evaluateMeanRatingById(passenger.getId(), Initiator.PASSENGER, PageRequest.of(0,50));
+            RatingEvaluationResponseTO ratingEvaluation = service.evaluateMeanRatingById(passenger.getId(), Initiator.PASSENGER, PageRequest.of(0, 50));
             String jsonRatingObject = mapper.writeValueAsString(ratingEvaluation);
             producer.sendMessagePassenger(jsonRatingObject);
-        } catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
         }
     }
