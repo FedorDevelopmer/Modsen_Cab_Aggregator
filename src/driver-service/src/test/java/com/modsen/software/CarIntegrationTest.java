@@ -7,17 +7,16 @@ import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import com.modsen.software.driver.repository.CarRepository;
-import com.modsen.software.driver.repository.DriverRepository;
 import com.modsen.software.driver.service.impl.CarServiceImpl;
 import com.modsen.software.driver.shedule.DriverServiceSchedule;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,10 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -63,12 +58,6 @@ public class CarIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private CarRepository carRepository;
-
-    @Autowired
-    private DriverRepository driverRepository;
 
     @MockBean
     private DriverServiceSchedule driverServiceSchedule;
@@ -143,9 +132,7 @@ public class CarIntegrationTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception{
-        driverRepository.deleteAll();
-        carRepository.deleteAll();
+    void setUp() throws Exception {
         jdbcTemplate.execute("TRUNCATE TABLE " + CARS_TABLE_NAME + " RESTART IDENTITY");
         jdbcTemplate.execute("TRUNCATE TABLE " + DRIVERS_TABLE_NAME + " RESTART IDENTITY CASCADE");
         saveDriver(driver);
@@ -176,7 +163,7 @@ public class CarIntegrationTest {
         saveCar(car);
         saveCar(secondCar);
         mockMvc.perform(get(URI)
-                        .param("brand","Honda")
+                        .param("brand", "Honda")
                         .contentType("application/json")
                         .accept("application/json"))
                 .andExpect(status().is(200))
@@ -229,7 +216,7 @@ public class CarIntegrationTest {
     @Test
     void testDeleteCarScore() throws Exception {
         saveCar(car);
-        mockMvc.perform(delete( URI + "/{id}", 1L))
+        mockMvc.perform(delete(URI + "/{id}", 1L))
                 .andExpect(status().is(204));
     }
 

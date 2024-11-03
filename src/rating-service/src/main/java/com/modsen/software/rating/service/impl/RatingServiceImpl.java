@@ -13,27 +13,19 @@ import com.modsen.software.rating.mapper.RatingScoreMapper;
 import com.modsen.software.rating.repository.RatingRepository;
 import com.modsen.software.rating.service.RatingService;
 import com.modsen.software.rating.specification.RatingScoreSpecification;
-import feign.Feign;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.okhttp.OkHttpClient;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RatingServiceImpl implements RatingService {
-
-    private final String DRIVER_SERVICE_URI = "http://localhost:8080/api/v1/drivers";
-
-    private final String PASSENGER_SERVICE_URI = "http://localhost:8081/api/v1/passengers";
 
     @Autowired
     private RatingRepository repository;

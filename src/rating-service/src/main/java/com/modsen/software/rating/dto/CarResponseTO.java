@@ -2,8 +2,8 @@ package com.modsen.software.rating.dto;
 
 import com.modsen.software.rating.entity.enumeration.Color;
 import com.modsen.software.rating.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.sql.Date;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

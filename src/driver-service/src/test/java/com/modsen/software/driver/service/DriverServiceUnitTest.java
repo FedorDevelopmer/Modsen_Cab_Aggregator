@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,12 +52,12 @@ public class DriverServiceUnitTest {
     @MockBean
     private CarRepository carRepository;
 
-    @MockBean
-    private DriverServiceSchedule scheduler;
-
     @InjectMocks
     @Autowired
     private DriverServiceImpl driverService;
+
+    @MockBean
+    private DriverServiceSchedule scheduler;
 
     private Driver driver;
 
@@ -66,6 +67,7 @@ public class DriverServiceUnitTest {
 
     @BeforeAll
     static void setUpCars() {
+
         DriverRelatedCarRequestTO carOne = new DriverRelatedCarRequestTO(
                 Color.GREEN,
                 "Ford",
@@ -88,7 +90,8 @@ public class DriverServiceUnitTest {
     }
 
     @BeforeEach
-    void setUpDriver() {
+    void setUpDriver() throws Exception {
+        Mockito.doNothing().when(scheduler).performDriverRatingUpdate();
         driver = Driver.builder()
                 .id(1L)
                 .name("John")

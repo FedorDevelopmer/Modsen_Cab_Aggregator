@@ -3,10 +3,10 @@ package com.modsen.software.rating.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.modsen.software.rating.entity.enumeration.Gender;
 import com.modsen.software.rating.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Set;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

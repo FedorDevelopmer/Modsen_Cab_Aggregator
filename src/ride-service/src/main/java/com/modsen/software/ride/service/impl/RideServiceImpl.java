@@ -1,13 +1,11 @@
 package com.modsen.software.ride.service.impl;
 
-import com.modsen.software.ride.dto.DriverResponseTO;
-import com.modsen.software.ride.dto.PassengerResponseTO;
+import com.modsen.software.ride.client.DriverClient;
+import com.modsen.software.ride.client.PassengerClient;
 import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.Ride;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
-import com.modsen.software.ride.exception.DriverNotFoundException;
-import com.modsen.software.ride.exception.PassengerNotFoundException;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.filter.RideFilter;
 import com.modsen.software.ride.mapper.RideMapper;
@@ -15,24 +13,21 @@ import com.modsen.software.ride.repository.RideRepository;
 import com.modsen.software.ride.service.RideService;
 import com.modsen.software.ride.specification.RideSpecification;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import java.util.Optional;
 
 @Service
 public class RideServiceImpl implements RideService {
 
-    private final String DRIVER_SERVICE_URI = "http://localhost:8080/api/v1/drivers";
-
-    private final String PASSENGER_SERVICE_URI = "http://localhost:8081/api/v1/passengers";
+    @Autowired
+    private DriverClient driverClient;
 
     @Autowired
-    private RestClient client;
+    private PassengerClient passengerClient;
 
     @Autowired
     private RideRepository repository;
@@ -65,8 +60,8 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public RideResponseTO updateRide(RideRequestTO rideTO) {
         repository.findById(rideTO.getId()).orElseThrow(RideNotFoundException::new);
-        getRideDriver(rideTO);
-        getRidePassenger(rideTO);
+        driverClient.getDriver(rideTO.getDriverId());
+        passengerClient.getPassenger(rideTO.getPassengerId());
         return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
     }
 
@@ -79,33 +74,13 @@ public class RideServiceImpl implements RideService {
 
     @Transactional
     public RideResponseTO saveRide(RideRequestTO rideTO) {
-        getRideDriver(rideTO);
-        getRidePassenger(rideTO);
+        driverClient.getDriver(rideTO.getDriverId());
+        passengerClient.getPassenger(rideTO.getPassengerId());
         return mapper.rideToResponse(repository.save(mapper.requestToRide(rideTO)));
     }
 
     @Transactional
     public void deleteRide(Long id) {
         repository.delete(mapper.responseToRide(findRideById(id)));
-    }
-
-    private void getRideDriver(RideRequestTO rideTO){
-        client.get()
-                .uri(DRIVER_SERVICE_URI + "/{id}", rideTO.getDriverId())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    throw new DriverNotFoundException();
-                }))
-                .body(DriverResponseTO.class);
-    }
-
-    private void getRidePassenger(RideRequestTO rideTO){
-        client.get()
-                .uri(PASSENGER_SERVICE_URI + "/{id}", rideTO.getPassengerId())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    throw new PassengerNotFoundException();
-                }))
-                .body(PassengerResponseTO.class);
     }
 }

@@ -14,12 +14,12 @@ public class RatingKafkaProducer {
 
     private final String PASSENGER_TOPIC = "rating-passenger";
 
-    public void sendMessageDriver(String message) throws JsonProcessingException  {
+    public void sendMessageDriver(String message) throws JsonProcessingException {
         kafkaTemplate.send(DRIVER_TOPIC, message);
         System.out.println("Sent by Rating to Driver Service: " + message);
     }
 
-    public void sendMessagePassenger(String message) throws JsonProcessingException  {
+    public void sendMessagePassenger(String message) throws JsonProcessingException {
         kafkaTemplate.send(PASSENGER_TOPIC, message);
         System.out.println("Sent by Rating to Passenger Service: " + message);
     }

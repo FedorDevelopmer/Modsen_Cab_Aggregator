@@ -2,9 +2,9 @@ package com.modsen.software.ride.specification;
 
 import com.modsen.software.ride.entity.Ride;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
-import org.springframework.data.jpa.domain.Specification;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import org.springframework.data.jpa.domain.Specification;
 
 public class RideSpecification {
 

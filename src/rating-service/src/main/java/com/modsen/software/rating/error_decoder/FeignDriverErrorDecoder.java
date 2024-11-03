@@ -10,9 +10,9 @@ public class FeignDriverErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        if(response.status() == HttpStatus.NOT_FOUND.value()){
+        if (response.status() == HttpStatus.NOT_FOUND.value()) {
             throw new DriverNotFoundException();
         }
-        return defaultDecoder.decode(methodKey,response);
+        return defaultDecoder.decode(methodKey, response);
     }
 }

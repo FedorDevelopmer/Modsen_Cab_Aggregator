@@ -9,6 +9,7 @@ import com.modsen.software.driver.filter.CarFilter;
 import com.modsen.software.driver.shedule.DriverServiceSchedule;
 import com.modsen.software.driver.specification.CarSpecification;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -30,7 +31,10 @@ import org.springframework.test.context.ActiveProfiles;
 public class CarRepositoryUnitTest {
 
     @Autowired
-    private CarRepository repository;
+    private CarRepository carRepository;
+
+    @Autowired
+    private DriverRepository driverRepository;
 
     @MockBean
     private DriverServiceSchedule scheduler;
@@ -73,16 +77,19 @@ public class CarRepositoryUnitTest {
                 .phoneNumber("+123-123-123")
                 .birthDate(new Date(System.currentTimeMillis()))
                 .ratingUpdateTimestamp(LocalDateTime.now())
-                .rating(BigDecimal.valueOf(5))
+                .rating(BigDecimal.valueOf(5).setScale(2, RoundingMode.CEILING))
                 .gender(Gender.MALE)
                 .removeStatus(RemoveStatus.ACTIVE)
                 .cars(new HashSet<>())
                 .build();
+        if (driverRepository.findById(1L).isEmpty()) {
+            driverRepository.save(driverStub);
+        }
     }
 
     @Test
     void testSaveCar() {
-        Car savedCar = repository.save(car);
+        Car savedCar = carRepository.save(car);
         Assertions.assertNotNull(car);
         Assertions.assertEquals(1L, savedCar.getId());
         Assertions.assertEquals("Ford", savedCar.getBrand());
@@ -91,10 +98,10 @@ public class CarRepositoryUnitTest {
 
     @Test
     void testUpdateCar() {
-        repository.save(car);
+        carRepository.save(car);
         car.setBrand("Renault");
         car.setRegistrationNumber("6TAX7338");
-        Car updatedCar = repository.save(car);
+        Car updatedCar = carRepository.save(car);
         Assertions.assertNotNull(updatedCar);
         Assertions.assertEquals("Renault", updatedCar.getBrand());
         Assertions.assertEquals("6TAX7338", updatedCar.getRegistrationNumber());
@@ -102,34 +109,34 @@ public class CarRepositoryUnitTest {
 
     @Test
     void testSoftDeleteCar() {
-        repository.save(car);
+        carRepository.save(car);
         car.setRemoveStatus(RemoveStatus.REMOVED);
-        Car removedCar = repository.save(car);
-        Assertions.assertNotEquals(Optional.empty(), repository.findById(removedCar.getId()));
+        Car removedCar = carRepository.save(car);
+        Assertions.assertNotEquals(Optional.empty(), carRepository.findById(removedCar.getId()));
         Assertions.assertEquals(RemoveStatus.REMOVED, removedCar.getRemoveStatus());
     }
 
     @Test
     void testFindById() {
-        repository.save(car);
-        Optional<Car> foundCar = repository.findById(car.getId());
+        carRepository.save(car);
+        Optional<Car> foundCar = carRepository.findById(car.getId());
         Assertions.assertNotEquals(Optional.empty(), foundCar);
         Assertions.assertEquals("6TAX7898", foundCar.get().getRegistrationNumber());
     }
 
     @Test
     void testFindByRegistrationNumber() {
-        repository.save(car);
-        Optional<Car> foundCar = repository.findByRegistrationNumber(car.getRegistrationNumber());
+        carRepository.save(car);
+        Optional<Car> foundCar = carRepository.findByRegistrationNumber(car.getRegistrationNumber());
         Assertions.assertNotEquals(Optional.empty(), foundCar);
         Assertions.assertEquals("6TAX7898", foundCar.get().getRegistrationNumber());
     }
 
     @Test
     void testFindAll() {
-        repository.save(car);
-        repository.save(secondCar);
-        List<Car> cars = repository.findAll();
+        carRepository.save(car);
+        carRepository.save(secondCar);
+        List<Car> cars = carRepository.findAll();
         Assertions.assertNotNull(cars);
         Assertions.assertEquals(2, cars.size());
         Assertions.assertEquals(car.getId(), cars.get(0).getId());
@@ -138,12 +145,12 @@ public class CarRepositoryUnitTest {
 
     @Test
     void testFindAllWithFilterByInspectionDate() {
-        repository.save(car);
-        repository.save(secondCar);
+        carRepository.save(car);
+        carRepository.save(secondCar);
         filter = new CarFilter();
         filter.setInspectionDate(new Date(System.currentTimeMillis()));
         Specification<Car> spec = Specification.where(CarSpecification.hasInspectionDate(filter.getInspectionDateEarlier()));
-        List<Car> cars = repository.findAll(spec);
+        List<Car> cars = carRepository.findAll(spec);
         Assertions.assertNotNull(cars);
         Assertions.assertEquals(2, cars.size());
         Assertions.assertEquals(car.getId(), cars.get(0).getId());

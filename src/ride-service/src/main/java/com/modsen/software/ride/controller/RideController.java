@@ -12,6 +12,8 @@ import com.modsen.software.ride.service.impl.RideServiceImpl;
 import com.modsen.software.ride.validation.OnCreate;
 import com.modsen.software.ride.validation.OnUpdate;
 import jakarta.validation.constraints.Min;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +27,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/api/v1/rides")
@@ -90,7 +90,7 @@ public class RideController {
     public ResponseEntity<Object> handleInvalidArgumentException(MethodArgumentNotValidException e, WebRequest request) {
         StringBuilder sb = new StringBuilder();
         sb.append("Validation failed for provided parameters: ");
-        for(FieldError error : e.getBindingResult().getFieldErrors()){
+        for (FieldError error : e.getBindingResult().getFieldErrors()) {
             sb.append("Invalid value ").append("'")
                     .append(error.getRejectedValue()).append("'")
                     .append(" for provided field ").append("'")

@@ -12,9 +12,15 @@ import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.repository.DriverRepository;
 import com.modsen.software.driver.service.impl.DriverServiceImpl;
-import jakarta.transaction.Transactional;
-import static org.hamcrest.Matchers.*;
-import org.junit.jupiter.api.*;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,14 +32,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,7 +115,7 @@ public class DriverIntegrationTest {
                 .gender(Gender.MALE)
                 .removeStatus(RemoveStatus.ACTIVE)
                 .ratingUpdateTimestamp(LocalDateTime.now())
-                .cars(Set.of(car,secondCar))
+                .cars(Set.of(car, secondCar))
                 .build();
         secondDriver = Driver.builder()
                 .id(2L)
@@ -153,7 +155,6 @@ public class DriverIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        driverRepository.deleteAll();
         jdbcTemplate.execute("TRUNCATE TABLE " + TABLE_NAME + " RESTART IDENTITY CASCADE");
     }
 
@@ -183,7 +184,7 @@ public class DriverIntegrationTest {
         saveDriver(driver);
         saveDriver(secondDriver);
         mockMvc.perform(get(URI)
-                        .param("gender",Gender.MALE.name())
+                        .param("gender", Gender.MALE.name())
                         .contentType("application/json")
                         .accept("application/json"))
                 .andExpect(status().is(200))

@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Component
-@FeignClient(value = "driverClient", url = "http://localhost:8080/api/v1/drivers", configuration = FeignDriverErrorDecoder.class)
+@FeignClient(name = "driver-service-client", configuration = FeignDriverErrorDecoder.class)
 public interface DriverClient {
-    @RequestMapping(method = RequestMethod.GET, path = "/{id}")
+
+    @RequestMapping(method = RequestMethod.GET, path = "api/v1/drivers/{id}")
     DriverResponseTO getDriver(@PathVariable("id") Long id);
 }

@@ -3,8 +3,8 @@ package com.modsen.software.ride.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.modsen.software.ride.entity.enumeration.Color;
 import com.modsen.software.ride.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.sql.Date;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

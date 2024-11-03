@@ -10,7 +10,6 @@ import com.modsen.software.rating.entity.RatingScore;
 import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.repository.RatingRepository;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +25,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 @Testcontainers
 @AutoConfigureMockMvc

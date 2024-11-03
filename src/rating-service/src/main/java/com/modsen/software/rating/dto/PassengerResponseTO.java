@@ -2,8 +2,8 @@ package com.modsen.software.rating.dto;
 
 import com.modsen.software.rating.entity.enumeration.Gender;
 import com.modsen.software.rating.entity.enumeration.RemoveStatus;
-import lombok.*;
 import java.math.BigDecimal;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

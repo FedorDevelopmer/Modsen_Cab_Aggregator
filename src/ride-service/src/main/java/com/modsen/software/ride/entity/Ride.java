@@ -2,9 +2,9 @@ package com.modsen.software.ride.entity;
 
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
