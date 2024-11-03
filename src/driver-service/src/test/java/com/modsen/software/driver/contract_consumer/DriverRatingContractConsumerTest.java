@@ -23,8 +23,9 @@ public class DriverRatingContractConsumerTest {
     private final String URL = "http://localhost:8082/api/v1/scores/evaluate/{id}";
 
     @Test
-    public void Given_ExistingDriverWithId_When_MeanRatingEvaluationRequest_Then_ReturnEvaluationResponse() {
+    public void whenMeanRatingEvaluationRequest_thenReturnEvaluationResponse() {
 
+        //when-then
         Response response = RestAssured.given()
                 .when()
                 .header("Content-Type", "application/json")

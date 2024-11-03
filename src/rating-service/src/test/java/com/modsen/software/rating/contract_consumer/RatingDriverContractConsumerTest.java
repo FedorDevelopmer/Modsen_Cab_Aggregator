@@ -25,8 +25,9 @@ public class RatingDriverContractConsumerTest {
     private final String URL = "http://localhost:8080/api/v1/drivers/{id}";
 
     @Test
-    public void Given_ExistingDriverWithId_When_GetByIdRequest_Then_ReturnDriverEntity() {
+    public void whenGetExistingDriverByIdRequest_thenReturnDriverEntity() {
 
+        //when-then
         Response response = RestAssured.given()
                 .when()
                 .header("Content-Type", "application/json")
@@ -42,8 +43,9 @@ public class RatingDriverContractConsumerTest {
     }
 
     @Test
-    public void Given_NotExistingDriverWithId_When_GetByIdRequest_Then_ReturnNotFoundResponse() {
+    public void whenGetNotExistingDriverByIdRequest_thenReturnNotFoundResponse() {
 
+        //when-then
         Response response = RestAssured.given()
                 .when()
                 .header("Content-Type", "application/json")

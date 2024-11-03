@@ -25,8 +25,9 @@ public class RidePassengerContractConsumerTest {
     private final String URL = "http://localhost:8081/api/v1/passengers/{id}";
 
     @Test
-    public void Given_ExistingPassengerWithId_When_GetByIdRequest_Then_ReturnPassengerEntity() {
+    public void whenGetExistingPassengerByIdRequest_thenReturnPassengerEntity() {
 
+        //when-then
         Response response = RestAssured.given()
                 .when()
                 .header("Content-Type", "application/json")
@@ -41,8 +42,9 @@ public class RidePassengerContractConsumerTest {
     }
 
     @Test
-    public void Given_NotExistingPassengerWithId_When_GetByIdRequest_Then_ReturnNotFoundResponse() {
+    public void whenGetNotExistingPassengerByIdRequest_thenReturnNotFoundResponse() {
 
+        //when-then
         Response response = RestAssured.given()
                 .when()
                 .header("Content-Type", "application/json")
