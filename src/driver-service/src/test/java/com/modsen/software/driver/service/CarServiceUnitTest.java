@@ -55,9 +55,6 @@ public class CarServiceUnitTest {
     @Autowired
     private CarServiceImpl carService;
 
-    @MockBean
-    private DriverServiceSchedule scheduler;
-
     private Car car;
 
     private Car secondCar;

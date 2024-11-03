@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class PassengerServiceTest {
+public class PassengerServiceUnitTest {
 
     @MockBean
     private PassengerRepository passengerRepository;
