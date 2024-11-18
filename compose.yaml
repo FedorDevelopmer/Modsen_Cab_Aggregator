@@ -1,0 +1,109 @@
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - services
+
+  kafka:
+    container_name: kafka_service
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_service:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - services
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: elasticsearch
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS : "-Xms512m -Xmx512m"
+      discovery.type : single-node
+      xpack.security.enabled : false
+      xpack.security.enrollment.enabled : false
+      xpack.ml.enabled : false
+      xpack.security.transport.ssl.enabled : false
+      xpack.security.http.ssl.enabled : false
+    ports:
+     - "9200:9200"
+     - "9300:9300"
+    networks:
+      - services
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  logstash:
+    image: logstash:8.15.0
+    container_name: logstash
+    volumes:
+      - ./logstash_directory/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    command: logstash -f pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - "9600:9600"
+      - "5001:5001"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - services
+
+  kibana:
+    image: kibana:8.15.0
+    container_name: kibana
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS : http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - services
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - services
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.15.0
+    container_name: metricbeat
+    volumes:
+      - ./metricbeat.yml:/usr/share/metricbeat/config/metricbeat.yml
+    ports:
+      - "9700:9700"
+    depends_on:
+      - elasticsearch
+    networks:
+      - services
+
+volumes:
+  elastic_data: {}
+
+networks:
+  services:
+    external: true

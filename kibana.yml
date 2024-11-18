@@ -1,0 +1,13 @@
+#
+# ** THIS IS AN AUTO-GENERATED FILE **
+#
+
+# Default Kibana configuration for docker target
+server.host: "0.0.0.0"
+server.shutdownTimeout: "5s"
+elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+elasticsearch.username: "elastic2"
+elasticsearch.password: "123456"
+elasticsearch.ssl.verificationMode: none
+monitoring.ui.container.elasticsearch.enabled: true
+xpack.monitoring.enabled: true
