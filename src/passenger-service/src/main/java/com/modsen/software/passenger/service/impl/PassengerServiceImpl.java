@@ -1,11 +1,11 @@
 package com.modsen.software.passenger.service.impl;
 
+import com.modsen.software.passenger.client.RatingClient;
 import com.modsen.software.passenger.dto.PassengerRequestTO;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
 import com.modsen.software.passenger.dto.RatingEvaluationResponseTO;
 import com.modsen.software.passenger.entity.Passenger;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
-import com.modsen.software.passenger.exception.BadEvaluationRequestException;
 import com.modsen.software.passenger.exception.DuplicateEmailException;
 import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
 import com.modsen.software.passenger.exception.PassengerNotFoundException;
@@ -15,18 +15,16 @@ import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.PassengerService;
 import com.modsen.software.passenger.specification.PassengerSpecification;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PassengerServiceImpl implements PassengerService {
@@ -36,9 +34,8 @@ public class PassengerServiceImpl implements PassengerService {
     @Autowired
     private PassengerMapper mapper;
 
-    WebClient ratingClient = WebClient.builder()
-            .baseUrl("http://localhost:8083/api/v1/scores")
-            .build();
+    @Autowired
+    private RatingClient ratingClient;
 
     @Transactional
     public Page<PassengerResponseTO> getAllPassengers(PassengerFilter filter, Pageable pageable) {
@@ -126,17 +123,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private RatingEvaluationResponseTO evaluateMeanRating(PassengerRequestTO passengerTO) {
-        return ratingClient.get()
-                .uri("/evaluate/{id}?initiator=PASSENGER", passengerTO.getId())
-                .retrieve()
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
-                    throw new PassengerNotFoundException();
-                })
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
-                    throw new BadEvaluationRequestException();
-                })
-                .bodyToMono(RatingEvaluationResponseTO.class)
-                .block();
+        return ratingClient.evaluateRating("PASSENGER", passengerTO.getId());
     }
 
     private Passenger updatePassengerDriverRating(Passenger passenger) {

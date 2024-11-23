@@ -3,20 +3,20 @@ package com.modsen.software.passenger.e2e;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.software.passenger.PassengerServiceApplication;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
-import com.modsen.software.passenger.dto.RatingEvaluationResponseTO;
 import com.modsen.software.passenger.entity.Passenger;
 import com.modsen.software.passenger.entity.enumeration.Gender;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
 import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
 import io.restassured.RestAssured;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -323,8 +323,8 @@ public class PassengerServiceE2ETest {
                 .get("http://localhost:" + ratingService.getFirstMappedPort() + "/api/v1/scores/evaluate/" + PassengerResponseTO.getId() + "?initiator=PASSENGER")
                 .then()
                 .statusCode(200)
-                .body("id",equalTo(1))
-                .body("meanEvaluation",equalTo(BigDecimal.valueOf(5).floatValue()));
+                .body("id", equalTo(1))
+                .body("meanEvaluation", equalTo(BigDecimal.valueOf(5).floatValue()));
     }
 
     private void savePassenger(Passenger passenger) throws Exception {

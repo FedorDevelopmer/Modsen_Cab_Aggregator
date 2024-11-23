@@ -48,12 +48,12 @@ public class CarServiceUnitTest {
     @MockBean
     private DriverRepository driverRepository;
 
-    @MockBean
-    private DriverServiceSchedule scheduler;
-
     @InjectMocks
     @Autowired
     private CarServiceImpl carService;
+
+    @MockBean
+    private DriverServiceSchedule scheduler;
 
     private Car car;
 

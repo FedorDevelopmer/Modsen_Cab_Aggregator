@@ -1,5 +1,6 @@
 package com.modsen.software.driver.service.impl;
 
+import com.modsen.software.driver.client.RatingClient;
 import com.modsen.software.driver.dto.DriverRelatedCarRequestTO;
 import com.modsen.software.driver.dto.DriverRequestTO;
 import com.modsen.software.driver.dto.DriverResponseTO;
@@ -7,7 +8,6 @@ import com.modsen.software.driver.dto.RatingEvaluationResponseTO;
 import com.modsen.software.driver.entity.Car;
 import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import com.modsen.software.driver.exception.BadEvaluationRequestException;
 import com.modsen.software.driver.exception.DriverNotFoundException;
 import com.modsen.software.driver.exception.DuplicateEmailException;
 import com.modsen.software.driver.exception.DuplicatePhoneException;
@@ -30,9 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class DriverServiceImpl implements DriverService {
@@ -49,9 +47,8 @@ public class DriverServiceImpl implements DriverService {
     @Autowired
     private CarMapper carMapper;
 
-    WebClient ratingClient = WebClient.builder()
-            .baseUrl("http://localhost:8083/api/v1/scores")
-            .build();
+    @Autowired
+    private RatingClient ratingClient;
 
     @Transactional
     public Page<DriverResponseTO> getAllDrivers(DriverFilter filter, Pageable pageable) {
@@ -162,17 +159,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     private RatingEvaluationResponseTO evaluateMeanRating(DriverRequestTO driverTO) {
-        return ratingClient.get()
-                .uri("/evaluate/{id}?initiator=DRIVER", driverTO.getId())
-                .retrieve()
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(404)), response -> {
-                    throw new DriverNotFoundException();
-                })
-                .onStatus(status -> status.isSameCodeAs(HttpStatusCode.valueOf(400)), response -> {
-                    throw new BadEvaluationRequestException();
-                })
-                .bodyToMono(RatingEvaluationResponseTO.class)
-                .block();
+        return ratingClient.evaluateRating("DRIVER", driverTO.getId());
     }
 
     private Driver updateDriverRating(Driver driver) {

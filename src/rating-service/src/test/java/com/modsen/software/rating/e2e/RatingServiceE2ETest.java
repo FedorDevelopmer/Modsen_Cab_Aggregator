@@ -2,23 +2,19 @@ package com.modsen.software.rating.e2e;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.software.rating.RatingServiceApplication;
-import com.modsen.software.rating.dto.DriverResponseTO;
 import com.modsen.software.rating.dto.RatingEvaluationResponseTO;
 import com.modsen.software.rating.entity.RatingScore;
-import com.modsen.software.rating.entity.enumeration.Gender;
 import com.modsen.software.rating.entity.enumeration.Initiator;
-import com.modsen.software.rating.entity.enumeration.RemoveStatus;
 import com.modsen.software.rating.repository.RatingRepository;
 import com.modsen.software.rating.service.impl.RatingServiceImpl;
 import io.restassured.RestAssured;
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.sql.Date;
-import java.util.*;
-import org.apache.kafka.clients.admin.AdminClient;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -33,10 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -159,7 +151,6 @@ public class RatingServiceE2ETest {
         passengerServiceDB.start();
         driverService.start();
         passengerService.start();
-
 
         ratingScore = RatingScore.builder()
                 .id(1L)

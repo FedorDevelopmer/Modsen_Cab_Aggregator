@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "com.modsen.software.passenger"})
 @EnableScheduling
 @EnableDiscoveryClient
+@EnableFeignClients
 public class PassengerServiceApplication {
 
     public static void main(String[] args) {

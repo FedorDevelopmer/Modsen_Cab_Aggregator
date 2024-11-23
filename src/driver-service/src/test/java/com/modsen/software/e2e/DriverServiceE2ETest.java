@@ -2,15 +2,12 @@ package com.modsen.software.e2e;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.software.driver.DriverServiceApplication;
+import com.modsen.software.driver.dto.DriverResponseTO;
 import com.modsen.software.driver.entity.Car;
 import com.modsen.software.driver.entity.Driver;
 import com.modsen.software.driver.entity.enumeration.Color;
 import com.modsen.software.driver.entity.enumeration.Gender;
 import com.modsen.software.driver.entity.enumeration.RemoveStatus;
-import com.modsen.software.driver.repository.DriverRepository;
-import com.modsen.software.driver.service.impl.DriverServiceImpl;
-import com.modsen.software.driver.dto.DriverResponseTO;
-import com.modsen.software.driver.dto.RatingEvaluationResponseTO;
 import io.restassured.RestAssured;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -30,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -107,7 +103,6 @@ public class DriverServiceE2ETest {
     private static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withNetwork(network)
             .withExposedPorts(9092, 9093);
-
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -478,8 +473,8 @@ public class DriverServiceE2ETest {
                 .get("http://localhost:" + ratingService.getFirstMappedPort() + "/api/v1/scores/evaluate/" + driverResponseTO.getId() + "?initiator=DRIVER")
                 .then()
                 .statusCode(200)
-                .body("id",equalTo(1))
-                .body("meanEvaluation",equalTo(BigDecimal.valueOf(5).floatValue()));
+                .body("id", equalTo(1))
+                .body("meanEvaluation", equalTo(BigDecimal.valueOf(5).floatValue()));
     }
 
     private void saveCar(Car car) throws Exception {
