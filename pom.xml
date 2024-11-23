@@ -40,6 +40,7 @@
         <spring-cloud-contract.version>4.1.4</spring-cloud-contract.version>
         <spring-cloud-starter-bootstrap.version>4.1.4</spring-cloud-starter-bootstrap.version>
         <spring-cloud-starter-eureka.version>4.1.3</spring-cloud-starter-eureka.version>
+        <logstash-logback.version>7.4</logstash-logback.version>
     </properties>
 
     <dependencies>
@@ -204,6 +205,27 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <version>${spring-cloud-starter-eureka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.zipkin.reporter2</groupId>
+            <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
     </dependencies>
 

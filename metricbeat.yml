@@ -6,5 +6,6 @@ metricbeat.modules:
     metrics:
       - metricsets: ["collector"]
 
+
 output.elasticsearch:
   hosts: ["http://elasticsearch:9200"]

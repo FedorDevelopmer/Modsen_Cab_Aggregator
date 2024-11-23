@@ -18,6 +18,7 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class RatingServiceImpl implements RatingService {
 
     private final String DRIVER_SERVICE_URI = "http://localhost:8080/api/v1/drivers";
@@ -49,6 +51,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Transactional
     public Page<RatingScoreResponseTO> getAllRatingScores(RatingScoreFilter filter, Pageable pageable) {
+        log.info("Fetching rating scores page - page number: {},page size: {}, is first: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), !pageable.hasPrevious());
         Specification<RatingScore> spec = Specification.where(RatingScoreSpecification.hasDriverId(filter.getDriverId()))
                 .and(RatingScoreSpecification.hasPassengerId(filter.getPassengerId()))
                 .and(RatingScoreSpecification.hasEvaluation(filter.getEvaluation()))
@@ -60,12 +64,17 @@ public class RatingServiceImpl implements RatingService {
 
     @Transactional
     public RatingScoreResponseTO findRatingScoreById(Long id) {
+        log.info("Fetching rating score by id {}",id);
         Optional<RatingScore> rating = repository.findById(id);
+        if (rating.isEmpty()) {
+            log.warn("Rating score with provided id {} not found",id);
+        }
         return mapper.ratingScoreToResponse(rating.orElseThrow(RatingScoreNotFoundException::new));
     }
 
     @Transactional
     public RatingEvaluationResponseTO evaluateMeanRatingById(Long id, Initiator initiator, Pageable pageable) {
+        log.info("Evaluating mean rating for {} with id {}",initiator.name(),id);
         Specification<RatingScore> spec;
         if (initiator.equals(Initiator.DRIVER)) {
             spec = Specification.where(RatingScoreSpecification.hasDriverId(id)
@@ -86,27 +95,38 @@ public class RatingServiceImpl implements RatingService {
             }
         }
         meanEvaluation = meanEvaluation.divide(BigDecimal.valueOf(50), RoundingMode.HALF_UP);
-        return new RatingEvaluationResponseTO(id, meanEvaluation);
+        RatingEvaluationResponseTO meanEvaluationResponse = new RatingEvaluationResponseTO(id, meanEvaluation);
+        log.info("Mean rating evaluation successfully created for {} with id {}, with rating value {}",
+                initiator.name(),id,meanEvaluationResponse.getMeanEvaluation());
+        return meanEvaluationResponse;
     }
 
     @Transactional
     public RatingScoreResponseTO updateRatingScore(RatingScoreRequestTO ratingTO) {
+        log.info("Updating rating score with id {}",ratingTO.getId());
         driverClient.getDriver(ratingTO.getDriverId());
         passengerClient.getPassenger(ratingTO.getPassengerId());
         repository.findById(ratingTO.getId()).orElseThrow(RatingScoreNotFoundException::new);
-        return mapper.ratingScoreToResponse(repository.save(mapper.requestToRatingScore(ratingTO)));
+        RatingScore savedScore = repository.save(mapper.requestToRatingScore(ratingTO));
+        log.info("Update for rating score with id {} complete successfully",ratingTO.getId());
+        return mapper.ratingScoreToResponse(savedScore);
     }
 
     @Transactional
     public RatingScoreResponseTO saveRatingScore(RatingScoreRequestTO ratingTO) {
+        log.info("Saving new rating score for driver with id {} and passenger with id {},initiated by {}",
+                ratingTO.getDriverId(), ratingTO.getPassengerId(),ratingTO.getInitiator().name());
         driverClient.getDriver(ratingTO.getDriverId());
         passengerClient.getPassenger(ratingTO.getPassengerId());
-        RatingScore saved = repository.save(mapper.requestToRatingScore(ratingTO));
-        return mapper.ratingScoreToResponse(saved);
+        RatingScore savedRatingScore = repository.save(mapper.requestToRatingScore(ratingTO));
+        log.info("New rating score with id {} saved successfully",savedRatingScore.getId());
+        return mapper.ratingScoreToResponse(savedRatingScore);
     }
 
     @Transactional
     public void deleteRatingScore(Long id) {
+        log.info("Deleting rating score with id {}", id);
         repository.delete(mapper.responseToRatingScore(findRatingScoreById(id)));
+        log.info("Rating score with id {} deleted successfully", id);
     }
 }
