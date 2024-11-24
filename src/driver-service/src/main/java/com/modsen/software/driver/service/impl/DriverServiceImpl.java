@@ -80,10 +80,10 @@ public class DriverServiceImpl implements DriverService {
 
     @Transactional
     public DriverResponseTO findDriverById(Long id) {
-        log.info("Fetching driver by id {}",id);
+        log.info("Fetching driver by id {}", id);
         Optional<Driver> driverOptional = repository.findById(id);
-        if(driverOptional.isEmpty()){
-            log.warn("Driver with provided id {} not found",id);
+        if (driverOptional.isEmpty()) {
+            log.warn("Driver with provided id {} not found", id);
         }
         Driver driver = driverOptional.orElseThrow(DriverNotFoundException::new);
         if (!LocalDateTime.now().isBefore(driver.getRatingUpdateTimestamp().plusDays(1))) {
@@ -97,8 +97,8 @@ public class DriverServiceImpl implements DriverService {
         log.info("Updating driver with id {}", driverTO.getId());
         checkDuplications(driverTO);
         Optional<Driver> oldDriverOptional = repository.findById(driverTO.getId());
-        if(oldDriverOptional.isEmpty()){
-            log.warn("Driver for update with provided id {} not found",driverTO.getId());
+        if (oldDriverOptional.isEmpty()) {
+            log.warn("Driver for update with provided id {} not found", driverTO.getId());
         }
         Driver oldDriver = oldDriverOptional.orElseThrow(DriverNotFoundException::new);
         Set<Car> cars = oldDriver.getCars();
@@ -108,23 +108,23 @@ public class DriverServiceImpl implements DriverService {
         driverToUpdate.setRating(oldDriver.getRating());
         if (!LocalDateTime.now().isBefore(oldDriver.getRatingUpdateTimestamp().plusDays(1))) {
             Driver savedDriver = updateDriverRating(driverToUpdate);
-            log.info("Update for driver with id {} complete successfully(mean rating updated)",driverTO.getId());
+            log.info("Update for driver with id {} complete successfully(mean rating updated)", driverTO.getId());
             return mapper.driverToResponse(savedDriver);
         } else {
             Driver savedDriver = repository.save(driverToUpdate);
-            log.info("Update for driver with id {} complete successfully(mean rating not updated)",driverTO.getId());
+            log.info("Update for driver with id {} complete successfully(mean rating not updated)", driverTO.getId());
             return mapper.driverToResponse(savedDriver);
         }
     }
 
     @Transactional
     public void updateDriverByKafka(RatingEvaluationResponseTO ratingEvaluation) {
-        log.info("Updating rating of driver with id {} through Kafka",ratingEvaluation.getId());
+        log.info("Updating rating of driver with id {} through Kafka", ratingEvaluation.getId());
         Driver driver = repository.findById(ratingEvaluation.getId()).orElseThrow(DriverNotFoundException::new);
         driver.setRating(ratingEvaluation.getMeanEvaluation());
         driver.setRatingUpdateTimestamp(LocalDateTime.now());
         repository.save(driver);
-        log.info("Mean rating for driver with id {} is updated through Kafka",ratingEvaluation.getId());
+        log.info("Mean rating for driver with id {} is updated through Kafka", ratingEvaluation.getId());
     }
 
     @Transactional
@@ -142,13 +142,13 @@ public class DriverServiceImpl implements DriverService {
             driverToSave.setRating(defaultRating);
             driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
             Driver savedDriver = repository.save(driverToSave);
-            log.info("New driver with id {} saved successfully",savedDriver.getId());
+            log.info("New driver with id {} saved successfully", savedDriver.getId());
             for (DriverRelatedCarRequestTO relatedCarRequestTO : requestCars) {
                 Car carToSave = carMapper.driverRelatedRequestToCar(relatedCarRequestTO);
                 carToSave.setDriverId(savedDriver.getId());
                 carToSave.setDriver(savedDriver);
                 Car savedCar = carsRepository.save(carToSave);
-                log.info("New car with id {} saved successfully",savedCar.getId());
+                log.info("New car with id {} saved successfully", savedCar.getId());
                 savedDriver.getCars().add(savedCar);
             }
             return mapper.driverToResponse(savedDriver);
@@ -159,7 +159,7 @@ public class DriverServiceImpl implements DriverService {
             driverToSave.setRating(defaultRating);
             driverToSave.setRatingUpdateTimestamp(LocalDateTime.now());
             Driver driver = repository.save(driverToSave);
-            log.info("New driver with id {} saved successfully",driver.getId());
+            log.info("New driver with id {} saved successfully", driver.getId());
             return mapper.driverToResponse(driver);
         }
     }
@@ -168,8 +168,8 @@ public class DriverServiceImpl implements DriverService {
     public void softDeleteDriver(Long id) {
         log.info("Softly deleting driver with id {}", id);
         Optional<Driver> driver = repository.findById(id);
-        if(driver.isEmpty()){
-            log.warn("Driver for soft delete with provided id {} not found",id);
+        if (driver.isEmpty()) {
+            log.warn("Driver for soft delete with provided id {} not found", id);
         }
         driver.orElseThrow(DriverNotFoundException::new).setRemoveStatus(RemoveStatus.REMOVED);
         updateDriver(mapper.driverToRequest(driver.get()));
@@ -215,11 +215,11 @@ public class DriverServiceImpl implements DriverService {
     }
 
     private Driver updateDriverRating(Driver driver) {
-        log.info("Evaluating mean rating for driver with id {} during update",driver.getId());
+        log.info("Evaluating mean rating for driver with id {} during update", driver.getId());
         RatingEvaluationResponseTO evaluatedRating = evaluateMeanRating(mapper.driverToRequest(driver));
         driver.setRating(evaluatedRating.getMeanEvaluation());
         driver.setRatingUpdateTimestamp(LocalDateTime.now());
-        log.info("Mean rating for driver with id {} is up to date",driver.getId());
+        log.info("Mean rating for driver with id {} is up to date", driver.getId());
         return repository.save(driver);
     }
 }

@@ -15,6 +15,7 @@ import com.modsen.software.ride.repository.RideRepository;
 import com.modsen.software.ride.service.RideService;
 import com.modsen.software.ride.specification.RideSpecification;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -61,32 +61,32 @@ public class RideServiceImpl implements RideService {
 
     @Transactional
     public RideResponseTO findRideById(Long id) {
-        log.info("Fetching ride by id {}",id);
+        log.info("Fetching ride by id {}", id);
         Optional<Ride> ride = repository.findById(id);
         if (ride.isEmpty()) {
-            log.warn("Ride with provided id {} not found",id);
+            log.warn("Ride with provided id {} not found", id);
         }
         return mapper.rideToResponse(ride.orElseThrow(RideNotFoundException::new));
     }
 
     @Transactional
     public RideResponseTO updateRide(RideRequestTO rideTO) {
-        log.info("Updating ride with id {}",rideTO.getId());
+        log.info("Updating ride with id {}", rideTO.getId());
         repository.findById(rideTO.getId()).orElseThrow(RideNotFoundException::new);
         getRideDriver(rideTO);
         getRidePassenger(rideTO);
         Ride savedRide = repository.save(mapper.requestToRide(rideTO));
-        log.info("Update for ride with id {} complete successfully",rideTO.getId());
+        log.info("Update for ride with id {} complete successfully", rideTO.getId());
         return mapper.rideToResponse(savedRide);
     }
 
     @Transactional
     public RideResponseTO updateRideStatus(Long id, RideStatus status) {
-        log.info("Updating ride status for entity with id {}, changing status to {}",id,status);
+        log.info("Updating ride status for entity with id {}, changing status to {}", id, status);
         Ride ride = repository.findById(id).orElseThrow(RideNotFoundException::new);
         ride.setRideStatus(status);
         Ride savedRide = repository.save(ride);
-        log.info("Status for ride with id {} successfully changed on {}",id,status);
+        log.info("Status for ride with id {} successfully changed on {}", id, status);
         return mapper.rideToResponse(savedRide);
     }
 
@@ -97,7 +97,7 @@ public class RideServiceImpl implements RideService {
         getRideDriver(rideTO);
         getRidePassenger(rideTO);
         Ride savedRide = repository.save(mapper.requestToRide(rideTO));
-        log.info("New ride with id {} saved successfully",savedRide.getId());
+        log.info("New ride with id {} saved successfully", savedRide.getId());
         return mapper.rideToResponse(savedRide);
     }
 
@@ -108,7 +108,7 @@ public class RideServiceImpl implements RideService {
         log.info("Ride with id {} deleted successfully", id);
     }
 
-    private void getRideDriver(RideRequestTO rideTO){
+    private void getRideDriver(RideRequestTO rideTO) {
         client.get()
                 .uri(DRIVER_SERVICE_URI + "/{id}", rideTO.getDriverId())
                 .retrieve()
@@ -120,7 +120,7 @@ public class RideServiceImpl implements RideService {
                 .body(DriverResponseTO.class);
     }
 
-    private void getRidePassenger(RideRequestTO rideTO){
+    private void getRidePassenger(RideRequestTO rideTO) {
         client.get()
                 .uri(PASSENGER_SERVICE_URI + "/{id}", rideTO.getPassengerId())
                 .retrieve()

@@ -53,10 +53,10 @@ public class CarServiceImpl implements CarService {
 
     @Transactional
     public CarResponseTO findCarById(Long id) {
-        log.info("Fetching car by id {}",id);
+        log.info("Fetching car by id {}", id);
         Optional<Car> car = repository.findById(id);
-        if(car.isEmpty()){
-            log.warn("Car with provided id {} not found",id);
+        if (car.isEmpty()) {
+            log.warn("Car with provided id {} not found", id);
         }
         return mapper.carToResponse(car.orElseThrow(CarNotFoundException::new));
     }
@@ -65,16 +65,16 @@ public class CarServiceImpl implements CarService {
     public CarResponseTO updateCar(CarRequestTO carTO) {
         log.info("Updating car with id {}", carTO.getId());
         checkDuplications(carTO);
-        if(repository.findById(carTO.getId()).isEmpty()){
-            log.warn("Car for update with provided id {} not found",carTO.getId());
+        if (repository.findById(carTO.getId()).isEmpty()) {
+            log.warn("Car for update with provided id {} not found", carTO.getId());
             throw new CarNotFoundException();
         }
         Optional<Driver> updatedCarDriver = driverRepository.findById(carTO.getDriverId());
-        if(updatedCarDriver.isEmpty()){
-            log.warn("Driver with id {} for updating car with id {} not found",carTO.getDriverId(), carTO.getId());
+        if (updatedCarDriver.isEmpty()) {
+            log.warn("Driver with id {} for updating car with id {} not found", carTO.getDriverId(), carTO.getId());
         }
         Car updatedCar = repository.save(mapper.requestToCar(carTO));
-        log.info("Update for car with id {} complete successfully",carTO.getId());
+        log.info("Update for car with id {} complete successfully", carTO.getId());
         updatedCarDriver.orElseThrow(DriverNotFoundException::new).getCars().add(updatedCar);
         updatedCar.setDriver(updatedCarDriver.get());
         return mapper.carToResponse(updatedCar);
@@ -84,8 +84,8 @@ public class CarServiceImpl implements CarService {
     public CarResponseTO saveCar(CarRequestTO carTO) {
         log.info("Saving new car with registration number {}", carTO.getRegistrationNumber());
         Optional<Driver> carDriver = driverRepository.findById(carTO.getDriverId());
-        if(carDriver.isEmpty()){
-            log.warn("Driver with id {} for creating new car not found",carTO.getId());
+        if (carDriver.isEmpty()) {
+            log.warn("Driver with id {} for creating new car not found", carTO.getId());
         }
         checkDuplications(carTO);
         Car savedCar = repository.save(mapper.requestToCar(carTO));
@@ -101,8 +101,8 @@ public class CarServiceImpl implements CarService {
     public void softDeleteCar(Long id) {
         log.info("Softly deleting car with id {}", id);
         Optional<Car> car = repository.findById(id);
-        if(car.isEmpty()){
-            log.warn("Car for soft delete with provided id {} not found",id);
+        if (car.isEmpty()) {
+            log.warn("Car for soft delete with provided id {} not found", id);
         }
         car.orElseThrow(CarNotFoundException::new).setRemoveStatus(RemoveStatus.REMOVED);
         updateCar(mapper.carToRequest(car.get()));

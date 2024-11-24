@@ -1,6 +1,6 @@
 <configuration>
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5001</destination>
+        <destination>logstash:5001</destination>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <mdc/>
@@ -22,11 +22,11 @@
                 </message>
                 <pattern>
                     <pattern>
-                    {
+                        {
                         "app_name" : "ride-service",
                         "trace_id" : "%X{traceId}",
                         "span_id" : "%X{spanId}"
-                    }
+                        }
                     </pattern>
                 </pattern>
             </providers>

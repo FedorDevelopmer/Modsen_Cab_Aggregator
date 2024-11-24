@@ -15,6 +15,11 @@ import com.modsen.software.passenger.repository.PassengerRepository;
 import com.modsen.software.passenger.service.PassengerService;
 import com.modsen.software.passenger.specification.PassengerSpecification;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,11 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -63,10 +63,10 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Transactional
     public PassengerResponseTO findPassengerById(Long id) {
-        log.info("Fetching passenger by id {}",id);
+        log.info("Fetching passenger by id {}", id);
         Optional<Passenger> passengerOptional = repository.findById(id);
         if (passengerOptional.isEmpty()) {
-            log.warn("Passenger with provided id {} not found",id);
+            log.warn("Passenger with provided id {} not found", id);
             throw new PassengerNotFoundException();
         }
         Passenger passenger = passengerOptional.get();
@@ -78,10 +78,10 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Transactional
     public PassengerResponseTO updatePassenger(PassengerRequestTO passengerTO) {
-        log.info("Updating passenger with id {}",passengerTO.getId());
+        log.info("Updating passenger with id {}", passengerTO.getId());
         Optional<Passenger> oldPassengerOptional = repository.findById(passengerTO.getId());
-        if(oldPassengerOptional.isEmpty()){
-            log.warn("Passenger for update with provided id {} not found",passengerTO.getId());
+        if (oldPassengerOptional.isEmpty()) {
+            log.warn("Passenger for update with provided id {} not found", passengerTO.getId());
             throw new PassengerNotFoundException();
         }
         checkDuplications(passengerTO);
@@ -91,23 +91,23 @@ public class PassengerServiceImpl implements PassengerService {
         passengerToUpdate.setRating(oldPassenger.getRating());
         if (!LocalDateTime.now().isBefore(oldPassenger.getRatingUpdateTimestamp().plusDays(1))) {
             Passenger updatedPassenger = updatePassengerDriverRating(passengerToUpdate);
-            log.info("Update for passenger with id {} complete successfully(mean rating updated)",passengerTO.getId());
+            log.info("Update for passenger with id {} complete successfully(mean rating updated)", passengerTO.getId());
             return mapper.passengerToResponse(updatedPassenger);
         } else {
             Passenger updatedPassenger = repository.save(passengerToUpdate);
-            log.info("Update for passenger with id {} complete successfully(mean rating not updated)",passengerTO.getId());
+            log.info("Update for passenger with id {} complete successfully(mean rating not updated)", passengerTO.getId());
             return mapper.passengerToResponse(updatedPassenger);
         }
     }
 
     @Transactional
     public void updatePassengerByKafka(RatingEvaluationResponseTO ratingEvaluation) {
-        log.info("Updating rating of passenger with id {} through Kafka",ratingEvaluation.getId());
+        log.info("Updating rating of passenger with id {} through Kafka", ratingEvaluation.getId());
         Passenger passenger = repository.findById(ratingEvaluation.getId()).orElseThrow(PassengerNotFoundException::new);
         passenger.setRating(ratingEvaluation.getMeanEvaluation());
         passenger.setRatingUpdateTimestamp(LocalDateTime.now());
         repository.save(passenger);
-        log.info("Mean rating for passenger with id {} is updated through Kafka",ratingEvaluation.getId());
+        log.info("Mean rating for passenger with id {} is updated through Kafka", ratingEvaluation.getId());
     }
 
     @Transactional
@@ -121,7 +121,7 @@ public class PassengerServiceImpl implements PassengerService {
         passengerToSave.setRating(defaultRating);
         passengerToSave.setRatingUpdateTimestamp(LocalDateTime.now());
         Passenger savedPassenger = repository.save(passengerToSave);
-        log.info("New passenger with id {} saved successfully",savedPassenger.getId());
+        log.info("New passenger with id {} saved successfully", savedPassenger.getId());
         return mapper.passengerToResponse(savedPassenger);
     }
 
@@ -129,8 +129,8 @@ public class PassengerServiceImpl implements PassengerService {
     public void softDeletePassenger(Long id) {
         log.info("Softly deleting passenger with id {}", id);
         Optional<Passenger> passenger = repository.findById(id);
-        if(passenger.isEmpty()){
-            log.warn("Passenger for soft delete with provided id {} not found",id);
+        if (passenger.isEmpty()) {
+            log.warn("Passenger for soft delete with provided id {} not found", id);
         }
         passenger.orElseThrow(PassengerNotFoundException::new).setRemoveStatus(RemoveStatus.REMOVED);
         updatePassenger(mapper.passengerToRequest(passenger.get()));
@@ -176,12 +176,12 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private Passenger updatePassengerDriverRating(Passenger passenger) {
-        log.info("Evaluating mean rating for passenger with id {} during update",passenger.getId());
+        log.info("Evaluating mean rating for passenger with id {} during update", passenger.getId());
         RatingEvaluationResponseTO evaluatedRating = evaluateMeanRating(mapper.passengerToRequest(passenger));
         passenger.setRating(evaluatedRating.getMeanEvaluation());
         passenger.setRatingUpdateTimestamp(LocalDateTime.now());
         Passenger updatedPassenger = repository.save(passenger);
-        log.info("Mean rating for passenger with id {} is up to date",passenger.getId());
+        log.info("Mean rating for passenger with id {} is up to date", passenger.getId());
         return updatedPassenger;
     }
 }
