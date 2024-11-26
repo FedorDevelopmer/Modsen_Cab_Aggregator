@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DriverServiceSchedule {
 
+    private final Integer delay = 30_000;
+
+    private final Integer rate = 60_000;
+
     @Autowired
     DriverService service;
 
@@ -25,7 +29,7 @@ public class DriverServiceSchedule {
     @Autowired
     private ObjectMapper mapper;
 
-    @Scheduled(initialDelay = 30000, fixedRate = 60000)
+    @Scheduled(initialDelay = delay, fixedRate = rate)
     public void performDriverRatingUpdate() throws JsonProcessingException {
         DriverFilter filter = new DriverFilter();
         int pageIndex = 0;

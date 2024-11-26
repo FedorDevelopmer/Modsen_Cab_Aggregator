@@ -7,6 +7,7 @@ import com.modsen.software.driver.entity.enumeration.RemoveStatus;
 import com.modsen.software.driver.exception.DriverNotFoundException;
 import com.modsen.software.driver.exception.DuplicateEmailException;
 import com.modsen.software.driver.exception.DuplicatePhoneException;
+import com.modsen.software.driver.exception.InvalidCredentialsException;
 import com.modsen.software.driver.exception_handler.ExceptionHandling;
 import com.modsen.software.driver.filter.DriverFilter;
 import com.modsen.software.driver.service.impl.DriverServiceImpl;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +35,12 @@ import org.springframework.web.context.request.WebRequest;
 @Controller
 @RequestMapping("/api/v1/drivers")
 public class DriverController {
+
     @Autowired
     private DriverServiceImpl service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<Page<DriverResponseTO>> getAll(@RequestParam(required = false) String name,
                                                          @RequestParam(required = false) String surname,
                                                          @RequestParam(required = false) String email,
@@ -44,7 +50,8 @@ public class DriverController {
                                                          @RequestParam(required = false) Date birthDate,
                                                          @RequestParam(required = false) Date birthDateLater,
                                                          @RequestParam(required = false) RemoveStatus removeStatus,
-                                                         @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+                                                         @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+                                                         @AuthenticationPrincipal Jwt jwt) {
         DriverFilter filter = new DriverFilter(name, surname, email, phoneNumber, gender, birthDateEarlier,
                 birthDate, birthDateLater, removeStatus);
         Page<DriverResponseTO> drivers = service.getAllDrivers(filter, pageable);
@@ -52,23 +59,27 @@ public class DriverController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DriverResponseTO> findById(@PathVariable @Min(1) Long id) {
+    @PreAuthorize("hasAnyRole('User','Admin')")
+    public ResponseEntity<DriverResponseTO> findById(@PathVariable @Min(1) Long id, @AuthenticationPrincipal Jwt jwt) {
         DriverResponseTO driver = service.findDriverById(id);
         return new ResponseEntity<>(driver, HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<DriverResponseTO> update(@Validated(OnUpdate.class) @RequestBody DriverRequestTO driverTO) {
+    @PreAuthorize("hasAnyRole('User','Admin')")
+    public ResponseEntity<DriverResponseTO> update(@Validated(OnUpdate.class) @RequestBody DriverRequestTO driverTO, @AuthenticationPrincipal Jwt jwt) {
         return new ResponseEntity<>(service.updateDriver(driverTO), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<DriverResponseTO> save(@Validated({OnCreate.class}) @RequestBody DriverRequestTO driverTO) {
+    @PreAuthorize("hasAnyRole('User','Admin')")
+    public ResponseEntity<DriverResponseTO> save(@Validated({OnCreate.class}) @RequestBody DriverRequestTO driverTO, @AuthenticationPrincipal Jwt jwt) {
         return new ResponseEntity<>(service.saveDriver(driverTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    @PreAuthorize("hasAnyRole('User','Admin')")
+    public ResponseEntity<String> delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         service.softDeleteDriver(id);
         return new ResponseEntity<>("Driver was successfully deleted(softly).", HttpStatus.NO_CONTENT);
     }
@@ -94,5 +105,10 @@ public class DriverController {
                     .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<Object> handleInvalidCredentialsException(RuntimeException e, WebRequest request) {
+        return ExceptionHandling.formExceptionResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 }

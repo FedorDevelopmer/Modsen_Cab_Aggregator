@@ -5,6 +5,7 @@ import com.modsen.software.rating.dto.RatingScoreRequestTO;
 import com.modsen.software.rating.dto.RatingScoreResponseTO;
 import com.modsen.software.rating.entity.enumeration.Initiator;
 import com.modsen.software.rating.exception.DriverNotFoundException;
+import com.modsen.software.rating.exception.InvalidCredentialsException;
 import com.modsen.software.rating.exception.PassengerNotFoundException;
 import com.modsen.software.rating.exception.RatingScoreNotFoundException;
 import com.modsen.software.rating.exception_handler.ExceptionHandling;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +36,7 @@ public class RatingController {
     private RatingServiceImpl service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<Page<RatingScoreResponseTO>> getAll(@RequestParam(required = false) Long driverId,
                                                               @RequestParam(required = false) Long passengerId,
                                                               @RequestParam(required = false) Integer evaluation,
@@ -47,6 +50,7 @@ public class RatingController {
     }
 
     @GetMapping("/evaluate/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RatingEvaluationResponseTO> evaluateMeanRatingById(@PathVariable @Min(1) Long id,
                                                                              @RequestParam Initiator initiator,
                                                                              @PageableDefault(page = 0, size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -55,22 +59,26 @@ public class RatingController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RatingScoreResponseTO> findById(@PathVariable @Min(1) Long id) {
         RatingScoreResponseTO rating = service.findRatingScoreById(id);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<RatingScoreResponseTO> update(@Validated(OnUpdate.class) @RequestBody RatingScoreRequestTO ratingTO) {
         return new ResponseEntity<>(service.updateRatingScore(ratingTO), HttpStatus.OK);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RatingScoreResponseTO> save(@Validated(OnCreate.class) @RequestBody RatingScoreRequestTO ratingTO) {
         return new ResponseEntity<>(service.saveRatingScore(ratingTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteRatingScore(id);
         return new ResponseEntity<>("Rating score successfully deleted", HttpStatus.NO_CONTENT);
@@ -92,5 +100,10 @@ public class RatingController {
                     .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<Object> handleInvalidCredentialsException(RuntimeException e, WebRequest request) {
+        return ExceptionHandling.formExceptionResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 }
