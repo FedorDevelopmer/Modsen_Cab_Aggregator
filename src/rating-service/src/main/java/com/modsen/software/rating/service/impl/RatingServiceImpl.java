@@ -2,11 +2,10 @@ package com.modsen.software.rating.service.impl;
 
 import com.modsen.software.rating.client.DriverClient;
 import com.modsen.software.rating.client.PassengerClient;
-import com.modsen.software.rating.dto.RatingEvaluationResponseTO;
-import com.modsen.software.rating.dto.RatingScoreRequestTO;
-import com.modsen.software.rating.dto.RatingScoreResponseTO;
+import com.modsen.software.rating.dto.*;
 import com.modsen.software.rating.entity.RatingScore;
 import com.modsen.software.rating.entity.enumeration.Initiator;
+import com.modsen.software.rating.exception.InvalidCredentialsException;
 import com.modsen.software.rating.exception.RatingScoreNotFoundException;
 import com.modsen.software.rating.filter.RatingScoreFilter;
 import com.modsen.software.rating.mapper.RatingScoreMapper;
@@ -17,15 +16,30 @@ import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class RatingServiceImpl implements RatingService {
+
+    @Value("${jwt.auth.resource-id}")
+    private String resourceId;
+
+    private final String DRIVER_SERVICE_URI = "http://localhost:8080/api/v1/drivers";
+
+    private final String PASSENGER_SERVICE_URI = "http://localhost:8081/api/v1/passengers";
 
     @Autowired
     private RatingRepository repository;
@@ -41,6 +55,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Transactional
     public Page<RatingScoreResponseTO> getAllRatingScores(RatingScoreFilter filter, Pageable pageable) {
+        log.info("Fetching rating scores page - page number: {},page size: {}, is first: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), !pageable.hasPrevious());
         Specification<RatingScore> spec = Specification.where(RatingScoreSpecification.hasDriverId(filter.getDriverId()))
                 .and(RatingScoreSpecification.hasPassengerId(filter.getPassengerId()))
                 .and(RatingScoreSpecification.hasEvaluation(filter.getEvaluation()))
@@ -52,12 +68,17 @@ public class RatingServiceImpl implements RatingService {
 
     @Transactional
     public RatingScoreResponseTO findRatingScoreById(Long id) {
+        log.info("Fetching rating score by id {}", id);
         Optional<RatingScore> rating = repository.findById(id);
+        if (rating.isEmpty()) {
+            log.warn("Rating score with provided id {} not found", id);
+        }
         return mapper.ratingScoreToResponse(rating.orElseThrow(RatingScoreNotFoundException::new));
     }
 
     @Transactional
     public RatingEvaluationResponseTO evaluateMeanRatingById(Long id, Initiator initiator, Pageable pageable) {
+        log.info("Evaluating mean rating for {} with id {}", initiator.name(), id);
         Specification<RatingScore> spec;
         if (initiator.equals(Initiator.DRIVER)) {
             spec = Specification.where(RatingScoreSpecification.hasDriverId(id)
@@ -78,27 +99,96 @@ public class RatingServiceImpl implements RatingService {
             }
         }
         meanEvaluation = meanEvaluation.divide(BigDecimal.valueOf(50), RoundingMode.HALF_UP);
-        return new RatingEvaluationResponseTO(id, meanEvaluation);
+        RatingEvaluationResponseTO meanEvaluationResponse = new RatingEvaluationResponseTO(id, meanEvaluation);
+        log.info("Mean rating evaluation successfully created for {} with id {}, with rating value {}",
+                initiator.name(), id, meanEvaluationResponse.getMeanEvaluation());
+        return meanEvaluationResponse;
     }
 
     @Transactional
     public RatingScoreResponseTO updateRatingScore(RatingScoreRequestTO ratingTO) {
+        log.info("Updating rating score with id {}", ratingTO.getId());
         driverClient.getDriver(ratingTO.getDriverId());
         passengerClient.getPassenger(ratingTO.getPassengerId());
         repository.findById(ratingTO.getId()).orElseThrow(RatingScoreNotFoundException::new);
-        return mapper.ratingScoreToResponse(repository.save(mapper.requestToRatingScore(ratingTO)));
+        RatingScore savedScore = repository.save(mapper.requestToRatingScore(ratingTO));
+        log.info("Update for rating score with id {} complete successfully", ratingTO.getId());
+        return mapper.ratingScoreToResponse(savedScore);
     }
 
     @Transactional
     public RatingScoreResponseTO saveRatingScore(RatingScoreRequestTO ratingTO) {
-        driverClient.getDriver(ratingTO.getDriverId());
-        passengerClient.getPassenger(ratingTO.getPassengerId());
-        RatingScore saved = repository.save(mapper.requestToRatingScore(ratingTO));
-        return mapper.ratingScoreToResponse(saved);
+        log.info("Saving new rating score for driver with id {} and passenger with id {},initiated by {}",
+                ratingTO.getDriverId(), ratingTO.getPassengerId(), ratingTO.getInitiator().name());
+        DriverResponseTO driver = driverClient.getDriver(ratingTO.getDriverId());
+        PassengerResponseTO passenger = passengerClient.getPassenger(ratingTO.getPassengerId());
+        String email = getUserEmail();
+        if ((driver.getEmail().equals(email) && !isAdmin() && ratingTO.getInitiator().equals(Initiator.DRIVER)
+                || passenger.getEmail().equals(email) && !isAdmin() && ratingTO.getInitiator().equals(Initiator.PASSENGER)
+        ) || isAdmin()) {
+            RatingScore savedRatingScore = repository.save(mapper.requestToRatingScore(ratingTO));
+            log.info("New rating score with id {} saved successfully", savedRatingScore.getId());
+            return mapper.ratingScoreToResponse(savedRatingScore);
+        } else {
+            if (ratingTO.getInitiator().equals(Initiator.DRIVER)) {
+                log.warn("User and driver emails during rating score creation are different: user email: {}, passenger email {}", email, driver.getEmail());
+                throw new InvalidCredentialsException("Driver email must be equal to email of user");
+            } else {
+                log.warn("User and passenger emails during rating score creation are different: user email: {}, passenger email {}", email, passenger.getEmail());
+                throw new InvalidCredentialsException("Passenger email must be equal to email of user");
+            }
+        }
     }
 
     @Transactional
     public void deleteRatingScore(Long id) {
+        log.info("Deleting rating score with id {}", id);
         repository.delete(mapper.responseToRatingScore(findRatingScoreById(id)));
+        log.info("Rating score with id {} deleted successfully", id);
+    }
+
+    private String getUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+            Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+            String email = jwt.getClaim("email").toString();
+            if (email != null) {
+                email = jwt.getClaim("email").toString();
+            } else {
+                log.warn("Field \"email\" is missed in JWT");
+                throw new InvalidCredentialsException("Required field of JWT is missed: email");
+            }
+            return email;
+        } else {
+            log.warn("Unexpected authentication type during obtaining user email: expected JwtAuthenticationToken, but provided {}", authentication.getClass().getTypeName());
+            throw new InvalidCredentialsException("Valid authentication type for application is JWT");
+        }
+    }
+
+    private boolean isAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+            Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+            return Optional.ofNullable(resourceAccess)
+                    .map(access -> (Map<String, Object>) access.get(resourceId))
+                    .map(clientAccess -> (List<String>) clientAccess.get("roles"))
+                    .map(roles -> {
+                        if (roles.contains("Admin")) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                    .orElseThrow(() -> {
+                        log.warn("Required field of JWT is missed: resource_access or {}", resourceId);
+                        throw new InvalidCredentialsException("Format of JWT fields is incorrect for valid token");
+                    });
+        } else {
+            log.warn("Unexpected authentication type during checking user role: expected JwtAuthenticationToken, but provided {}", authentication.getClass().getTypeName());
+            throw new InvalidCredentialsException();
+        }
     }
 }

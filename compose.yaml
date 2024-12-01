@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   zookeeper:
     container_name: zookeeper
@@ -28,6 +27,251 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - services
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: elasticsearch
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      discovery.type: single-node
+      xpack.security.enabled: false
+      xpack.security.enrollment.enabled: false
+      xpack.ml.enabled: false
+      xpack.security.transport.ssl.enabled: false
+      xpack.security.http.ssl.enabled: false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - services
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+
+  logstash:
+    image: logstash:8.15.0
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    command: logstash -f pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - "9600:9600"
+      - "5001:5001"
+    networks:
+      - services
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  kibana:
+    image: kibana:8.15.0
+    container_name: kibana
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - services
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - services
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - services
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    networks:
+      - services
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HTTP_PORT: 8090
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_DEBUG: true
+      KC_LOG_LEVEL: debug
+    command:
+      - "start-dev"
+    network_mode: "service:localhost"
+
+  cab_driver_service:
+    image: driver_service
+    container_name: driver_service_container
+    build:
+      context: src/driver-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://services_postgres_db/driverdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=UltraStrongPassw0rd
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_service:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA.CLIENT.SERVICE_URL.DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:8090/realms/CabAggregatorRealm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://localhost:8090/realms/CabAggregatorRealm/protocol/openid-connect/certs
+    network_mode: "service:localhost"
+
+  cab_passenger_service:
+    image: passenger_service
+    container_name: passenger_service_container
+    build:
+      context: src/passenger-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://services_postgres_db/passengerdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=UltraStrongPassw0rd
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_service:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA.CLIENT.SERVICE_URL.DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:8090/realms/CabAggregatorRealm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://localhost:8090/realms/CabAggregatorRealm/protocol/openid-connect/certs
+    network_mode: "service:localhost"
+
+  cab_rating_service:
+    image: rating_service
+    container_name: rating_service_container
+    build:
+      context: src/rating-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://services_postgres_db/ratingdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=UltraStrongPassw0rd
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_service:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA.CLIENT.SERVICE_URL.DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:8090/realms/CabAggregatorRealm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://localhost:8090/realms/CabAggregatorRealm/protocol/openid-connect/certs
+    network_mode: "service:localhost"
+
+  cab_ride_service:
+    image: ride_service
+    container_name: ride_service_container
+    build:
+      context: src/ride-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://services_postgres_db/ridesdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=UltraStrongPassw0rd
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_service:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA.CLIENT.SERVICE_URL.DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:8090/realms/CabAggregatorRealm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://localhost:8090/realms/CabAggregatorRealm/protocol/openid-connect/certs
+    network_mode: "service:localhost"
+
+  cab_eureka_service:
+    container_name: eureka-server
+    image: eureka_service
+    build:
+      context: src/eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - services
+
+  cab_api_gateway_service:
+    container_name: api-gateway-service
+    image: api-gateway
+    build:
+      context: src/apigateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+    environment:
+      - EUREKA.CLIENT.SERVICE_URL.DEFAULT_ZONE=http://eureka-server:8761/eureka/
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - services
+
+  postgres:
+    container_name: services_postgres_db
+    image: postgres
+    environment:
+      POSTGRES_DB: "driverdb"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "UltraStrongPassw0rd"
+    volumes:
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init.sh
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d driverdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - services
+
+  localhost:
+    image: alpine:latest
+    container_name: localhost
+    command: sleep infinity
+    ports:
+      - "8090:8090"
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+    networks:
+      - services
+
+
+volumes:
+  elastic_data: { }
+
 networks:
   services:
     external: true

@@ -4,10 +4,7 @@ import com.modsen.software.passenger.dto.PassengerRequestTO;
 import com.modsen.software.passenger.dto.PassengerResponseTO;
 import com.modsen.software.passenger.entity.enumeration.Gender;
 import com.modsen.software.passenger.entity.enumeration.RemoveStatus;
-import com.modsen.software.passenger.exception.BadEvaluationRequestException;
-import com.modsen.software.passenger.exception.DuplicateEmailException;
-import com.modsen.software.passenger.exception.DuplicatePhoneNumberException;
-import com.modsen.software.passenger.exception.PassengerNotFoundException;
+import com.modsen.software.passenger.exception.*;
 import com.modsen.software.passenger.exception_handler.ExceptionHandling;
 import com.modsen.software.passenger.filter.PassengerFilter;
 import com.modsen.software.passenger.service.impl.PassengerServiceImpl;
@@ -21,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +33,7 @@ public class PassengerController {
     private PassengerServiceImpl service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<Page<PassengerResponseTO>> getAll(@RequestParam(required = false) String name,
                                                             @RequestParam(required = false) String email,
                                                             @RequestParam(required = false) String phoneNumber,
@@ -47,22 +46,26 @@ public class PassengerController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<PassengerResponseTO> findById(@PathVariable @Min(1) Long id) {
         PassengerResponseTO passenger = service.findPassengerById(id);
         return new ResponseEntity<>(passenger, HttpStatus.OK);
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<PassengerResponseTO> update(@Validated(OnUpdate.class) @RequestBody PassengerRequestTO passengerTO) {
         return new ResponseEntity<>(service.updatePassenger(passengerTO), HttpStatus.OK);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<PassengerResponseTO> save(@Validated(OnCreate.class) @RequestBody PassengerRequestTO passengerTO) {
         return new ResponseEntity<>(service.savePassenger(passengerTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.softDeletePassenger(id);
         return new ResponseEntity<>("Passenger successfully deleted(softly)", HttpStatus.NO_CONTENT);
@@ -89,5 +92,10 @@ public class PassengerController {
                     .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<Object> handleInvalidCredentialsException(RuntimeException e, WebRequest request) {
+        return ExceptionHandling.formExceptionResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 }

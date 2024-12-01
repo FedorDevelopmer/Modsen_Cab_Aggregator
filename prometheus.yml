@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'driver-service-metrics'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+
+  - job_name: 'passenger-service-metrics'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: [ 'host.docker.internal:8081' ]
+
+  - job_name: 'ride-service-metrics'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: [ 'host.docker.internal:8082' ]
+
+  - job_name: 'rating-service-metrics'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: [ 'host.docker.internal:8083' ]
+

@@ -4,6 +4,7 @@ import com.modsen.software.ride.dto.RideRequestTO;
 import com.modsen.software.ride.dto.RideResponseTO;
 import com.modsen.software.ride.entity.enumeration.RideStatus;
 import com.modsen.software.ride.exception.DriverNotFoundException;
+import com.modsen.software.ride.exception.InvalidCredentialsException;
 import com.modsen.software.ride.exception.PassengerNotFoundException;
 import com.modsen.software.ride.exception.RideNotFoundException;
 import com.modsen.software.ride.exception_handler.ExceptionHandling;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +37,7 @@ public class RideController {
     private RideServiceImpl service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<Page<RideResponseTO>> getAll(@RequestParam(required = false) Long driverId,
                                                        @RequestParam(required = false) Long passengerId,
                                                        @RequestParam(required = false) String departureAddress,
@@ -55,28 +58,33 @@ public class RideController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RideResponseTO> findById(@PathVariable @Min(1) Long id) {
         RideResponseTO ride = service.findRideById(id);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<RideResponseTO> update(@Validated(OnUpdate.class) @RequestBody RideRequestTO rideTO) {
         return new ResponseEntity<>(service.updateRide(rideTO), HttpStatus.OK);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RideResponseTO> save(@Validated(OnCreate.class) @RequestBody RideRequestTO rideTO) {
         return new ResponseEntity<>(service.saveRide(rideTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteRide(id);
         return new ResponseEntity<>("Ride successfully deleted", HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/status/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<RideResponseTO> updateStatus(@PathVariable Long id, @RequestParam RideStatus status) {
         return new ResponseEntity<>(service.updateRideStatus(id, status), HttpStatus.OK);
     }
@@ -97,5 +105,10 @@ public class RideController {
                     .append(error.getField()).append("'. \n ");
         }
         return ExceptionHandling.formExceptionResponse(HttpStatus.BAD_REQUEST, sb.toString(), request);
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<Object> handleInvalidCredentialsException(RuntimeException e, WebRequest request) {
+        return ExceptionHandling.formExceptionResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 }

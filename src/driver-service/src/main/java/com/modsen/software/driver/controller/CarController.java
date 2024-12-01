@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +36,7 @@ public class CarController {
     private CarServiceImpl service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<Page<CarResponseTO>> getAll(@RequestParam(required = false) Color color,
                                                       @RequestParam(required = false) String brand,
                                                       @RequestParam(required = false) String registrationNumber,
@@ -52,23 +54,27 @@ public class CarController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('User','Admin')")
     public ResponseEntity<CarResponseTO> findById(@PathVariable @Min(1) Long id) {
         CarResponseTO car = service.findCarById(id);
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<CarResponseTO> update(@Validated(OnUpdate.class) @RequestBody CarRequestTO carTO) {
         CarResponseTO updatedCar = service.updateCar(carTO);
         return new ResponseEntity<>(updatedCar, HttpStatus.OK);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<CarResponseTO> save(@Validated(OnCreate.class) @RequestBody CarRequestTO carTO) {
         return new ResponseEntity<>(service.saveCar(carTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('Admin')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.softDeleteCar(id);
         return new ResponseEntity<>("Car was successfully delete(softly).", HttpStatus.NO_CONTENT);
